@@ -1,1 +1,16 @@
-# Airfield
+# The Airfield
+
+## Project goal
+...
+
+## Architecture
+...
+
+## Tech stack
+...
+
+## Structure
+...
+
+## How to build
+...
