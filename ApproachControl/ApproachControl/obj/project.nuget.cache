@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "iKE9HCdGjdS9GaIjgcN8dnb+9PvB5Tu0RHOMNQLKToCiIyjmcCzSkH5QaZ1A/zu7/cOQJ76eJ6YEAxT+H0gqxQ==",
+  "success": true,
+  "projectFilePath": "D:\\Airfield\\ApproachControl\\ApproachControl\\ApproachControl.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\user\\.nuget\\packages\\rabbitmq.client\\6.4.0\\rabbitmq.client.6.4.0.nupkg.sha512",
+    "C:\\Users\\user\\.nuget\\packages\\system.memory\\4.5.4\\system.memory.4.5.4.nupkg.sha512",
+    "C:\\Users\\user\\.nuget\\packages\\system.threading.channels\\4.7.1\\system.threading.channels.4.7.1.nupkg.sha512"
+  ],
+  "logs": []
+}

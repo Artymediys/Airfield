@@ -1,0 +1,17 @@
+D:\Airfield\ApproachControl\ApproachControl\bin\Debug\net6.0\ApproachControl.exe
+D:\Airfield\ApproachControl\ApproachControl\bin\Debug\net6.0\ApproachControl.deps.json
+D:\Airfield\ApproachControl\ApproachControl\bin\Debug\net6.0\ApproachControl.runtimeconfig.json
+D:\Airfield\ApproachControl\ApproachControl\bin\Debug\net6.0\ApproachControl.dll
+D:\Airfield\ApproachControl\ApproachControl\bin\Debug\net6.0\ApproachControl.pdb
+D:\Airfield\ApproachControl\ApproachControl\bin\Debug\net6.0\RabbitMQ.Client.dll
+D:\Airfield\ApproachControl\ApproachControl\obj\Debug\net6.0\ApproachControl.csproj.AssemblyReference.cache
+D:\Airfield\ApproachControl\ApproachControl\obj\Debug\net6.0\ApproachControl.GeneratedMSBuildEditorConfig.editorconfig
+D:\Airfield\ApproachControl\ApproachControl\obj\Debug\net6.0\ApproachControl.AssemblyInfoInputs.cache
+D:\Airfield\ApproachControl\ApproachControl\obj\Debug\net6.0\ApproachControl.AssemblyInfo.cs
+D:\Airfield\ApproachControl\ApproachControl\obj\Debug\net6.0\ApproachControl.csproj.CoreCompileInputs.cache
+D:\Airfield\ApproachControl\ApproachControl\obj\Debug\net6.0\ApproachControl.csproj.CopyComplete
+D:\Airfield\ApproachControl\ApproachControl\obj\Debug\net6.0\ApproachControl.dll
+D:\Airfield\ApproachControl\ApproachControl\obj\Debug\net6.0\refint\ApproachControl.dll
+D:\Airfield\ApproachControl\ApproachControl\obj\Debug\net6.0\ApproachControl.pdb
+D:\Airfield\ApproachControl\ApproachControl\obj\Debug\net6.0\ApproachControl.genruntimeconfig.cache
+D:\Airfield\ApproachControl\ApproachControl\obj\Debug\net6.0\ref\ApproachControl.dll
