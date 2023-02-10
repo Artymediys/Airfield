@@ -7,11 +7,13 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-func Index(l *slog.Logger) http.HandlerFunc {
+func PlaneOutOfZone(l *slog.Logger) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		l.Info("Index handler called")
+		l.Info("PlaneOutOfZone handler called")
 
-		_, err := fmt.Fprintf(w, "Hello from the index handler!")
+		// body: json { "plane_id": number , "operator": string }
+
+		_, err := fmt.Fprintf(w, "OK")
 		if err != nil {
 			l.Error("Failed to write response", err)
 		}

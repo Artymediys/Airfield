@@ -18,8 +18,14 @@ func New(l *slog.Logger) chi.Router {
 		Router: chi.NewRouter(),
 	}
 
-	r.Mount("/", handlers.Index(l))
+	r.Get("/", handlers.Index(l))
 	r.Mount("/plane", handlers.Plane(l))
+	r.Mount("/position", handlers.Position(l))
+	r.Mount("/height", handlers.Height(l))
+	r.Mount("/passenger", handlers.Passenger(l))
+	r.Post("/transfer", handlers.Transfer(l))
+	r.Post("/plane_out_of_zone", handlers.PlaneOutOfZone(l))
+	r.Post("/service", handlers.Service(l))
 
 	return r
 }

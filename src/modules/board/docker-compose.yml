@@ -1,0 +1,13 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3.11.8-management-alpine
+    hostname: rabbitmq
+    restart: always
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+#    volumes:
+#      - ./rabbitmq:/var/lib/rabbitmq
+    ports:
+      - 15672:15672
+      - 5672:5672

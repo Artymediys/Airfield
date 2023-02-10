@@ -7,11 +7,13 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-func Index(l *slog.Logger) http.HandlerFunc {
+func Service(l *slog.Logger) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		l.Info("Index handler called")
+		l.Info("Service handler called")
 
-		_, err := fmt.Fprintf(w, "Hello from the index handler!")
+		// body { state: start/finish, module: moduleName, plane_id: int }
+
+		_, err := fmt.Fprintf(w, "OK")
 		if err != nil {
 			l.Error("Failed to write response", err)
 		}
