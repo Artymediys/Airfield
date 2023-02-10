@@ -1,11 +1,19 @@
-const express = require('express')
-const app = express()
-const port = 3000
+const TowerController = require("./tower_controller");
+const ModuleInterface = require("./interface");
+const Tester = require("./tester");
 
-app.get('/', (req, res) => {
-    res.send('Hello World!')
-})
 
-app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`)
-})
+
+const towerController = new TowerController();
+
+const planeManager = new ModuleInterface.PlaneManager();
+const approachControl = new ModuleInterface.ApproachControl();
+const groundControl = new ModuleInterface.GroundControl();
+const airportService = new ModuleInterface.AirportService();
+const informationBoard = new ModuleInterface.InformationBoard();
+
+approachControl.addListener("transfer_plane", id => {
+	planeManager.getPlane(id).then(console.log);
+});
+
+Tester.setup(planeManager, approachControl);
