@@ -9,7 +9,10 @@ namespace ApproachControl
 	{
         static void Receive(string message)
         {
-
+            if(message == "Start")
+            {
+                Console.WriteLine("Вау");
+            }
         }
 
         static void Main(string[] args)

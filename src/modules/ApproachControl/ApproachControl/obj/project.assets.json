@@ -114,23 +114,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\user\\.nuget\\packages\\": {},
+    "C:\\Users\\tatat\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Airfield\\src\\modules\\ApproachControl\\ApproachControl\\ApproachControl.csproj",
+      "projectUniqueName": "B:\\git\\Airfield\\src\\modules\\ApproachControl\\ApproachControl\\ApproachControl.csproj",
       "projectName": "ApproachControl",
-      "projectPath": "D:\\Airfield\\src\\modules\\ApproachControl\\ApproachControl\\ApproachControl.csproj",
-      "packagesPath": "C:\\Users\\user\\.nuget\\packages\\",
-      "outputPath": "D:\\Airfield\\src\\modules\\ApproachControl\\ApproachControl\\obj\\",
+      "projectPath": "B:\\git\\Airfield\\src\\modules\\ApproachControl\\ApproachControl\\ApproachControl.csproj",
+      "packagesPath": "C:\\Users\\tatat\\.nuget\\packages\\",
+      "outputPath": "B:\\git\\Airfield\\src\\modules\\ApproachControl\\ApproachControl\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\user\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\tatat\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
