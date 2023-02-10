@@ -7,7 +7,7 @@ namespace ApproachControl
 {
 	internal class Program
 	{
-        static void SendMessage(string message)
+        static void Receive(string message)
         {
 
         }
@@ -16,11 +16,18 @@ namespace ApproachControl
 		{
 
 
-            // Подключение к RabbitMo
-            var factory = new ConnectionFactory { HostName = "Localhost" };
-            var connection = factory.CreateConnection();
+			// Подключение к RabbitMo
+			var factory = new ConnectionFactory
+			{
+				HostName = "178.20.43.80",
+				UserName = "guest",
+				Password = "guest",
+				VirtualHost = "/",
+				Port = 15672
+			};
+			var connection = factory.CreateConnection();
             var channel = connection.CreateModel();
-            string name = "ApproachControl";
+            string name = "Approach Control";
 
             // Создание очереди
             channel.QueueDeclare(
@@ -37,7 +44,7 @@ namespace ApproachControl
             {
                 var body = ea.Body.ToArray();
                 var message = Encoding.UTF8.GetString(body);
-                SendMessage(message);
+                Receive(message);
                 Console.WriteLine($" [x] Received {message}");
             };
             channel.BasicConsume(queue: "Visualizer",
@@ -53,16 +60,16 @@ namespace ApproachControl
 
             //Подключение к exchange вашего модуля
             channel.QueueBind(
-                exchange: "имя вашего модуля",
-                queue: "имя вашего модуля",
-                routingKey: "имя вашего модуля"
-                );
+                exchange: name,
+                queue: name,
+                routingKey: name
+				);
 
             //Подключение к global exchange
             channel.QueueBind(
                 exchange: "global",
-                queue: "имя вашего модуля",
-                routingKey: "имя вашего модуля"
+                queue: name,
+                routingKey: name
                 );
 
             //Отправка сообщения Visualizer, означающее, что вы подключились
