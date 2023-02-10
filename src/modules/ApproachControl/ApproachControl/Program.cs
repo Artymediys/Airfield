@@ -26,7 +26,7 @@ namespace ApproachControl
 				UserName = "guest",
 				Password = "guest",
 				VirtualHost = "/",
-				Port = 15672
+				Port = 5672
 			};
 			var connection = factory.CreateConnection();
             var channel = connection.CreateModel();
@@ -76,7 +76,7 @@ namespace ApproachControl
                 );
 
             //Отправка сообщения Visualizer, означающее, что вы подключились
-            string message = "Tower Control";
+            string message = name;
             var body = Encoding.UTF8.GetBytes(message);
             channel.BasicPublish(
                 exchange: "Visualizer",
