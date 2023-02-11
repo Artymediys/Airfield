@@ -9,15 +9,23 @@ import (
 	"airfield-board/internal/config"
 	"airfield-board/internal/log"
 	"airfield-board/internal/router"
+	"airfield-board/internal/store"
 )
 
 func main() {
 	lgr := log.New()
-	cfg := config.New()
-	r := router.New(lgr)
+	cfg, err := config.New()
+	if err != nil {
+		lgr.Error("Failed to read config", err)
+		return
+	}
+
+	planeStore := store.NewPlane()
+
+	r := router.New(lgr, planeStore)
 	a := app.New(cfg, r, lgr)
 
-	rabbit, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
+	rabbit, err := amqp.Dial(cfg.RabbitMQAddr())
 	if err != nil {
 		lgr.Error("Failed to connect to RabbitMQ", err)
 		return

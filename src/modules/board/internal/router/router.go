@@ -5,27 +5,30 @@ import (
 	"golang.org/x/exp/slog"
 
 	"airfield-board/internal/handlers"
+	"airfield-board/internal/store"
 )
 
 type Router struct {
 	chi.Router
-	logger *slog.Logger
+	logger     *slog.Logger
+	planeStore *store.Plane
 }
 
-func New(l *slog.Logger) chi.Router {
+func New(l *slog.Logger, p *store.Plane) chi.Router {
 	r := &Router{
-		logger: l,
-		Router: chi.NewRouter(),
+		logger:     l,
+		Router:     chi.NewRouter(),
+		planeStore: p,
 	}
 
-	r.Get("/", handlers.Index(l))
-	r.Mount("/plane", handlers.Plane(l))
-	r.Mount("/position", handlers.Position(l))
-	r.Mount("/height", handlers.Height(l))
-	r.Mount("/passenger", handlers.Passenger(l))
-	r.Post("/transfer", handlers.Transfer(l))
-	r.Post("/plane_out_of_zone", handlers.PlaneOutOfZone(l))
-	r.Post("/service", handlers.Service(l))
+	r.Get("/", handlers.Index(r.logger))
+	r.Mount("/plane", handlers.Plane(r.logger, r.planeStore))
+	r.Mount("/position", handlers.Position(r.logger))
+	r.Mount("/height", handlers.Height(r.logger))
+	r.Mount("/passenger", handlers.Passenger(r.logger))
+	r.Post("/transfer", handlers.Transfer(r.logger))
+	r.Post("/plane_out_of_zone", handlers.PlaneOutOfZone(r.logger))
+	r.Post("/service", handlers.Service(r.logger))
 
 	return r
 }

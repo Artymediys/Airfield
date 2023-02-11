@@ -1,6 +1,10 @@
 package model
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/google/uuid"
+)
 
 type PlaneType string
 
@@ -37,10 +41,12 @@ type Plane struct {
 	CurrentFood uint
 }
 
-func CreatePlanByType(planeType PlaneType) (*Plane, error) {
+func CreatePlanByType(planeType PlaneType, flight string) (*Plane, error) {
+
 	switch planeType {
 	case PlaneTypePassenger:
 		return &Plane{
+			ID:                uuid.NewString(),
 			Type:              PlaneTypePassenger,
 			MaxPassengers:     100,
 			MaxCargo:          100,
@@ -48,15 +54,18 @@ func CreatePlanByType(planeType PlaneType) (*Plane, error) {
 			CurrentPassengers: 100,
 			CurrentCargo:      100,
 			CurrentFood:       100,
+			Flight:            flight,
 		}, nil
 	case PlaneTypeCargo:
 		return &Plane{
+			ID:            uuid.NewString(),
 			Type:          PlaneTypeCargo,
 			MaxCargo:      100,
 			CurrentCargo:  100,
 			MaxFood:       100,
 			CurrentFood:   100,
 			MaxPassengers: 0,
+			Flight:        flight,
 		}, nil
 	default:
 		return nil, ErrPlaneTypeNotSupported
