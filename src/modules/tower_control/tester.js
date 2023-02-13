@@ -1,5 +1,5 @@
-const Vec2 = require("./vec2");
-const ModuleInterface = require("./interface");
+const Vec3 = require("./vec3");
+const ModuleInterface = require("./module_interface");
 
 // Returns a random number between min (inclusive) and max (exclusive)
 function getRandom(min, max)
@@ -31,7 +31,7 @@ function setup(planeManager, approachControl)
 
 	setInterval(() =>
 	{
-		const plane = new ModuleInterface.Plane(planeManager, getRandomInt(0, 10000), new Vec2(getRandom(-500.0, 500.0), getRandom(300.0, 600.0)), getRandom(30.0, 70.0));
+		const plane = new ModuleInterface.Plane(planeManager, getRandomInt(0, 10000), new Vec3(getRandom(-500.0, 500.0), getRandom(400.0, 700.0), getRandom(300.0, 600.0)), getRandom(30.0, 70.0));
 		allPlanes.set(plane.id, plane);
 		approachControl.emit("transfer_plane", plane.id);
 	}, 3 * 1000);

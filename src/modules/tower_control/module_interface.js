@@ -11,6 +11,38 @@ class Plane
 		this.pos = pos;
 		this.speed = speed;
 	}
+
+	copy()
+	{
+		const planeCopy = new Plane(this._manager, this.id, this.pos.copy(), this.speed);
+		
+		if(this.dest)
+		{
+			planeCopy.dest = this.dest.copy();
+		}
+
+		return planeCopy;
+	}
+
+	update()
+	{
+		this._manager.updatePlane(this);
+	}
+
+	setDestination(pos, notify)
+	{
+		this.dest = pos;
+
+		if(notify)
+		{
+			this._manager.setPlaneDestination(this, pos);
+		}
+	}
+
+	setOperator(operatorName)
+	{
+		this._manager.setPlaneOperator(this, operatorName);
+	}
 }
 
 class PlaneManager
@@ -19,7 +51,7 @@ class PlaneManager
 	{
 		// Stub. TODO: fetch actual data from plane manager
 
-		return Promise.resolve(new Plane(this, 0, new Vec2(0.0), 0.0));
+		return Promise.resolve(new Plane(this, 0, new Vec3(0.0), 0.0));
 	};
 
 	updatePlane(plane)
@@ -27,12 +59,12 @@ class PlaneManager
 		// Stub. TODO: fetch actual data from plane manager
 	}
 
-	setDestination(plane, pos)
+	setPlaneDestination(plane, pos)
 	{
 		// Stub. TODO: send actual destination to plane manager
 	}
 
-	setOperator(operatorName)
+	setPlaneOperator(plane, operatorName)
 	{
 		// Stub. TODO: send actual operator to plane manager
 	}

@@ -1,5 +1,5 @@
 const TowerController = require("./tower_controller");
-const ModuleInterface = require("./interface");
+const ModuleInterface = require("./module_interface");
 const Tester = require("./tester");
 
 
@@ -12,8 +12,12 @@ const groundControl = new ModuleInterface.GroundControl();
 const airportService = new ModuleInterface.AirportService();
 const informationBoard = new ModuleInterface.InformationBoard();
 
+
+
+/*
 approachControl.addListener("transfer_plane", id => {
 	planeManager.getPlane(id).then(console.log);
 });
+*/
 
 Tester.setup(planeManager, approachControl);
