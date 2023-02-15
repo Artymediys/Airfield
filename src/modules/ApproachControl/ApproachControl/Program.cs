@@ -2,9 +2,11 @@
 using RabbitMQ.Client.Events;
 using System;
 using System.Text;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Threading.Channels;
 using System.Xml.Linq;
+using System.Text.Json.Serialization;
 
 namespace ApproachControl
 {
@@ -84,10 +86,13 @@ namespace ApproachControl
 	{
 		static void Main(string[] args)
 		{
-			Rabbit rabbit = new Rabbit();
-			rabbit.Send("Approach Control", "Visualizer");
-			
-
+			//Rabbit rabbit = new Rabbit();
+			//rabbit.Send("Approach Control", "Visualizer");
+			BoardControl board = new BoardControl();
+            Board boarder = new Board();
+            boarder.plane_id = "1212";
+            string test = board.GetCordRequest(boarder).ToString();
+            Console.WriteLine(test);
 
 		}
 	}
@@ -97,64 +102,104 @@ namespace ApproachControl
         Rabbit rabbit = new Rabbit();
         public BoardControl() { }
         List<Board> activeBoards = new List<Board>();
-
-        bool PlaneTransfer()
+        
+        JsonSerializerOptions options = new JsonSerializerOptions()
         {
-            string body = "";
-            HttpRequestMessage msg = new HttpRequestMessage(HttpMethod.Get, body);
-            
+            WriteIndented = true,
+            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+            IgnoreNullValues = true
+        };//Выставление опций сериализации
 
-            return true;
-        }
+
+        HttpRequestMessage Transfer(Board board)
+        {
+            Board request = new Board();
+            request.SetStateForJSON(board.plane_id, null, null, null, null, "Tower control");
+            string body = JsonSerializer.Serialize<Board>(request, options);
+            HttpRequestMessage msg = new HttpRequestMessage(HttpMethod.Get, body);
+            return msg;
+        }//POST /transfer, body: json { "plane_id": string, "dispatcher": string }
+
+        HttpRequestMessage TransferPlane(Board board)
+        {
+            Board request = new Board();
+            request.SetStateForJSON(board.plane_id);
+            string body = JsonSerializer.Serialize<Board>(request, options);
+            HttpRequestMessage msg = new HttpRequestMessage(HttpMethod.Get, body);
+            return msg;
+        }//POST /transfer_plane, body: json { "plane_id": string }
+
+        HttpRequestMessage PlaneOutOfZone(Board board)
+        {
+            Board request = new Board();
+            request.SetStateForJSON(board.plane_id, null, null, null, null, null, true);
+            string body = JsonSerializer.Serialize<Board>(request, options);
+            HttpRequestMessage msg = new HttpRequestMessage(HttpMethod.Get, body);
+            return msg;
+        }//POST /plane_out_of_zone, body: json { "plane_id": string, "out_of_zone": bool }
+
+
         void AddNewBoard(string json)
         {
             Board? board = JsonSerializer.Deserialize<Board>(json);
             activeBoards.Add(board);
-        }
+        }//Добавление борта в список бортов для управления
+
+
         void RouteCalculating(Board board)
         {
             //Реализация просчета маршрутов
-        }
-    }
-    class Board
-    {
-        string id;
-        float x, y, z;
-        string status;
+        }//Просчет маршрута движения самолетов для передачи на круг и для вывода за пределы зоны покрытия
 
-        HttpRequestMessage Destination(float x, float y, float z)
+
+        HttpRequestMessage Destination(string id, float x, float y, float z)
         {
-            Dot destination = new Dot(id, x, y, z);
-            string body = JsonSerializer.Serialize(destination);
-            HttpRequestMessage msg = new HttpRequestMessage(HttpMethod.Post, body);
+            Board destination = new Board();
+            destination.SetStateForJSON(id, x, y, z);
+            string jsonString = JsonSerializer.Serialize(destination, options);
+            HttpRequestMessage msg = new HttpRequestMessage(HttpMethod.Post, jsonString);
+
             return msg;
         }//POST /destination, body: json { "plane_id": string, "x": number, "y": number, "z": number }
 
-        void GetCord(HttpRequestMessage msg)
-        {
-            string body = msg.RequestUri.ToString();
-            Dot curentCord = JsonSerializer.Deserialize<Dot>(body);
-            x = curentCord.x;
-            y = curentCord.y;
-            z = curentCord.z;
-        }
 
-        void Transfer()
+        public HttpRequestMessage GetCordRequest(Board board)
         {
-            string body = "{ \"plane_id\": ... , \"operator\": ... }";
-        }//POST /transfer, body: json { "plane_id": string, "operator": string }
+            Board request = new Board();
+            request.SetStateForJSON(board.plane_id);
+            string jsonString = JsonSerializer.Serialize<Board>(request, options);
+            HttpRequestMessage msg = new HttpRequestMessage(HttpMethod.Get, jsonString);
+            return msg;
+        }//GET /current_cord?id=...
+
+
+        void GetCordAnsver(Board board, string jsonString) 
+        {
+            board = JsonSerializer.Deserialize<Board>(jsonString);
+        }//json { "x": number, "y": number, "z": number  }
     }
 
-    class Dot
-    {
-        string plane_id;
-        public float x, y, z;
-        public Dot(string id, float x, float y, float z)
+
+    class Board
+    {//БОООООООООООООООООЛЬШЕЕЕЕЕЕЕЕЕЕЕЕЕЕ ВООООООООПРОООООООООООСИИИИИИИИКООООООООООООВ
+        public string? plane_id { get; set; }
+        public float? x { get; set; }
+        public float? y { get; set; }
+        public float? z { get; set; }
+        public string? status { get; set; }
+        public string? dispatcher { get; set; }
+
+        public bool? outOfZone { get; set; }
+        public void SetStateForJSON(string? id = null, float? x = null, float? y = null,
+            float? z = null, string? status = null, string? dispatcher = null, bool? outOfZone = null)
         {
             plane_id = id;
             this.x = x;
             this.y = y;
             this.z = z;
+            this.status = status;
+            this.dispatcher = dispatcher;
+            this.outOfZone = outOfZone;
         }
     }
 }

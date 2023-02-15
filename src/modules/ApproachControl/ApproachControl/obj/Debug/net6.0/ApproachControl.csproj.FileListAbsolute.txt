@@ -49,3 +49,5 @@ B:\git\Airfield\src\modules\ApproachControl\ApproachControl\obj\Debug\net6.0\ref
 B:\git\Airfield\src\modules\ApproachControl\ApproachControl\obj\Debug\net6.0\ApproachControl.pdb
 B:\git\Airfield\src\modules\ApproachControl\ApproachControl\obj\Debug\net6.0\ApproachControl.genruntimeconfig.cache
 B:\git\Airfield\src\modules\ApproachControl\ApproachControl\obj\Debug\net6.0\ref\ApproachControl.dll
+B:\git\Airfield\src\modules\ApproachControl\ApproachControl\bin\Debug\net6.0\Newtonsoft.Json.dll
+B:\git\Airfield\src\modules\ApproachControl\ApproachControl\bin\Debug\net6.0\Newtonsoft.Json.Bson.dll
