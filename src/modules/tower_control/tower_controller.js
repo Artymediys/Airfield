@@ -13,7 +13,7 @@ module.exports = class TowerController
 
 	loop()
 	{
-		for(const plane in this.approachingPlanes.slice().concat(this.circuit.planeEchelons))
+		for(const plane of this.approachingPlanes.slice().concat(this.circuit.planeEchelons))
 		{
 			// plane.manager.updatePlane(plane);
 		}

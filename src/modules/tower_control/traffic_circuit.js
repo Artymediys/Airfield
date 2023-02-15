@@ -17,8 +17,8 @@ module.exports = class TrafficCircuit
 
 		this._clockwise = false;
 
-		this._triggerRadius = 50.0;
-		this._safetyRadius = 150.0;
+		this._triggerRadius = 20.0;
+		this._safetyRadius = 50.0;
 
 		this.planeEchelons = [ [], [], [], [] ];
 	}
@@ -30,7 +30,7 @@ module.exports = class TrafficCircuit
 
 	_getCornerByIdx(idx)
 	{
-		return this._corners[idx % this._corners.length];
+		return this._corners[idx % this._corners.length].copy();
 	}
 
 	_getNextCornerByIdx(idx)
@@ -123,13 +123,11 @@ module.exports = class TrafficCircuit
 		return planeCopy.pos;
 	}
 
-	// TODO: 2d or 3d
 	_areTooClose(pos1, pos2)
 	{
 		return pos1.copy().sub(pos2).length() < this._safetyRadius;
 	}
 
-	// TODO: 2d or 3d
 	_isPlaneInTarget(plane)
 	{
 		return plane.pos.copy().sub(plane.dest).length() < this._triggerRadius;
@@ -137,9 +135,10 @@ module.exports = class TrafficCircuit
 
 	_canEnterEchelon(target, time, idx) // TODO: account for planes that are not in the ring but approaching it
 	{
-		for(const alignedPlane in this.planeEchelons[idx])
+		for(const alignedPlane of this.planeEchelons[idx])
 		{
 			const simulatedPos = this._simulatePlane(alignedPlane, time, idx);
+			console.log("pos", alignedPlane.pos, simulatedPos);
 
 			if(this._areTooClose(target, simulatedPos))
 			{
@@ -150,7 +149,7 @@ module.exports = class TrafficCircuit
 		return true;
 	}
 
-	align(plane)
+	align(plane) // test this
 	{
 		const quarter = this._getQuarterForPlane(plane);
 		const line = this._getClosestLineIndices(...quarter);
@@ -204,7 +203,7 @@ module.exports = class TrafficCircuit
 	{
 		for(let i = 0; i < this.echelon.length; ++i)
 		{
-			for(const plane in this.planeEchelons[i])
+			for(const plane of this.planeEchelons[i])
 			{
 				this._updatePlaneDestination(plane, i, false);
 			}
