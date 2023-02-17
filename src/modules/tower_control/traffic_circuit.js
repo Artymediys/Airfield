@@ -1,5 +1,4 @@
 const Vec2 = require("./vec2");
-const Vec3 = require("./vec3");
 const Plane = require("./module_interface").Plane;
 
 module.exports = class TrafficCircuit
@@ -138,7 +137,6 @@ module.exports = class TrafficCircuit
 		for(const alignedPlane of this.planeEchelons[idx])
 		{
 			const simulatedPos = this._simulatePlane(alignedPlane, time, idx);
-			console.log("pos", alignedPlane.pos, simulatedPos);
 
 			if(this._areTooClose(target, simulatedPos))
 			{
@@ -149,28 +147,33 @@ module.exports = class TrafficCircuit
 		return true;
 	}
 
-	align(plane) // test this
+	alignPlane(plane)
 	{
 		const quarter = this._getQuarterForPlane(plane);
 		const line = this._getClosestLineIndices(...quarter);
 		const corner = this._getCornerByIdx(this._getCornerIdxBasedOnDirection(line));
 
-		const projectedPoint = line.length === 1 ? line[0] : plane.pos.horizontal().projectClamped(...line);
-
-		const target = projectedPoint.copy().add(corner).div(2.0);
-
-		const dist = plane.pos.horizontal().sub(target).length(); // TODO: 3d dist
-		const time = dist / plane.speed;
+		const projectedPoint = line.length === 1 ? this._getCornerByIdx(line[0]) : plane.pos.horizontal().projectClamped(...line.map(i => this._getCornerByIdx(i)));
 
 		for(let i = 0; i < this.planeEchelons.length; ++i) // TODO: pick closest echelon by Y first
 		{
+			const target = projectedPoint.copy().add(corner).div(2.0).withY(this._getEchelonHeightByIdx(i));
+
+			const dist = plane.pos.copy().sub(target).length();
+			const time = dist / plane.speed;
+
 			if(this._canEnterEchelon(target, time, i))
 			{
-				return new Vec3(target.x, i * this.height, target.y); // TODO: send dest to plane
+				return [ target, i ];
 			}
 		}
 
-		// TODO: refuse plane
+		return null;
+	}
+
+	addPlaneToEchelon(plane, echelonIdx)
+	{
+		this.planeEchelons[echelonIdx].push(plane);
 	}
 
 	_updatePlaneDestination(plane, echelonIdx, simulate)
@@ -191,17 +194,17 @@ module.exports = class TrafficCircuit
 		const echelonHeight = this._getEchelonHeightByIdx(echelonIdx);
 
 		// plane reached corner dest
-		if(plane.dest.fuzzyEquals(new Vec3(corner.x, echelonHeight, corner.y), 0.1))
+		if(plane.dest.fuzzyEquals(corner.withY(echelonHeight), 0.1))
 		{
 			dest = this._getNextCornerByIdx(cornerIdx);
 		}
 
-		plane.setDestination(new Vec3(dest.x, echelonHeight, dest.y), !simulate);
+		plane.setDestination(dest.withY(echelonHeight), !simulate);
 	}
 
 	updateDestinations()
 	{
-		for(let i = 0; i < this.echelon.length; ++i)
+		for(let i = 0; i < this.planeEchelons.length; ++i)
 		{
 			for(const plane of this.planeEchelons[i])
 			{

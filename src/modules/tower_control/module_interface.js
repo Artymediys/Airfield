@@ -1,4 +1,4 @@
-const Vec2 = require("./vec2");
+const Vec3 = require("./vec3");
 const EventEmitter = require("events").EventEmitter;
 
 class Plane
@@ -24,9 +24,9 @@ class Plane
 		return planeCopy;
 	}
 
-	update()
+	async update()
 	{
-		this._manager.updatePlane(this);
+		return this._manager.updatePlane(this);
 	}
 
 	setDestination(pos, notify)
@@ -47,16 +47,21 @@ class Plane
 
 class PlaneManager
 {
-	getPlane(id)
+	getPlaneData(id)
 	{
 		// Stub. TODO: fetch actual data from plane manager
 
-		return Promise.resolve(new Plane(this, 0, new Vec3(0.0), 0.0));
+		return Promise.resolve({ x: 0, y: 0, z: 0, speed: 0, destX: 0, destY: 0, destZ: 0 });
 	};
 
-	updatePlane(plane)
+	async updatePlane(plane)
 	{
-		// Stub. TODO: fetch actual data from plane manager
+		console.log("abab");
+		console.log(await Promise.resolve("sus"));
+		const data = await this.getPlaneData(plane.id);
+		plane.pos = new Vec3(data.x, data.y, data.z);
+		plane.speed = data.speed;
+		plane.dest = new Vec3(data.destX, data.destY, data.destZ);
 	}
 
 	setPlaneDestination(plane, pos)

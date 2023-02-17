@@ -15,15 +15,29 @@ function getRandomInt(min, max)
 	return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function setup(planeManager, approachControl)
+function toData(plane)
+{
+	return {
+		id: plane.id,
+		x: plane.pos.x,
+		y: plane.pos.y,
+		z: plane.pos.z,
+		speed: plane.speed,
+		destX: plane.dest.x,
+		destY: plane.dest.y,
+		destZ: plane.dest.z
+	}
+}
+
+function setup(towerController, planeManager, approachControl)
 {
 	const allPlanes = new Map();
 
-	planeManager.getPlane = id =>
+	planeManager.getPlaneData = id =>
 	{
 		if(allPlanes.has(id))
 		{
-			return Promise.resolve(allPlanes.get(id));
+			return Promise.resolve( toData( allPlanes.get(id) ) );
 		}
 
 		return Promise.reject();
@@ -31,9 +45,37 @@ function setup(planeManager, approachControl)
 
 	setInterval(() =>
 	{
-		const plane = new ModuleInterface.Plane(planeManager, getRandomInt(0, 10000), new Vec3(getRandom(-500.0, 500.0), getRandom(400.0, 700.0), getRandom(300.0, 600.0)), getRandom(30.0, 70.0));
+		for(const plane of allPlanes.values())
+		{
+			const move = plane.dest.copy().sub(plane.pos).normalize().mul(plane.speed * towerController._timePerTick / 1000.0);
+			plane.pos.add(move);
+		}
+
+	}, towerController._timePerTick);
+
+	setInterval(() =>
+	{
+		const id = getRandomInt(-1000, 1000);
+
+		if(allPlanes.has(id))
+		{
+			return;
+		}
+
+		const plane = new ModuleInterface.Plane(
+			planeManager,
+			id,
+			new Vec3(
+				getRandom(-towerController.circuit.width / 2, towerController.circuit.width / 2),
+				getRandom(towerController.circuit.height, towerController.circuit.height * 2),
+				getRandom(towerController.circuit.length * 1.5, towerController.circuit.length * 2)),
+			getRandom(10.0, 50.0));
+		plane.dest = new Vec3(0.0, plane.pos.y, 0.0);
+
 		allPlanes.set(plane.id, plane);
+
 		approachControl.emit("transfer_plane", plane.id);
+
 	}, 3 * 1000);
 }
 

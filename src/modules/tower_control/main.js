@@ -4,7 +4,7 @@ const Tester = require("./tester");
 
 
 
-const towerController = new TowerController();
+const towerController = new TowerController(10);
 
 const planeManager = new ModuleInterface.PlaneManager();
 const approachControl = new ModuleInterface.ApproachControl();
@@ -12,19 +12,17 @@ const groundControl = new ModuleInterface.GroundControl();
 const airportService = new ModuleInterface.AirportService();
 const informationBoard = new ModuleInterface.InformationBoard();
 
-const Vec3 = require("./vec3");
+towerController.start();
 
-const plane = new ModuleInterface.Plane(planeManager, 0, new Vec3(-500, 200, -200), 10);
-plane.dest = new Vec3(500, 200, -200);
-
-towerController.circuit.planeEchelons[0].push(plane);
-
-console.log(towerController.circuit._canEnterEchelon(new Vec3(-349, 200, -200), 10, 0));
-
-/*
-approachControl.addListener("transfer_plane", id => {
-	planeManager.getPlane(id).then(console.log);
+approachControl.addListener("transfer_plane", async id =>
+{
+	const plane = new ModuleInterface.Plane(planeManager, id, null, 0);
+	await plane.update();
+	towerController.addPlane(plane);
 });
-*/
 
-Tester.setup(planeManager, approachControl);
+Tester.setup(towerController, planeManager, approachControl);
+
+module.exports = {
+	towerController
+};

@@ -10,6 +10,11 @@ module.exports = class Vec2
 		return new Vec2(this.x, this.y);
 	}
 
+	withY(val)
+	{
+		return new (require("./vec3")) (this.x, val, this.y);
+	}
+
 	length()
 	{
 		return Math.sqrt(this.x * this.x + this.y * this.y);
@@ -25,7 +30,7 @@ module.exports = class Vec2
 				return this;
 			}
 
-			if(x instanceof Vec2) // TODO: any object with x and y
+			if(x.x != undefined && x.y != undefined)
 			{
 				binaryFunc(x.x, x.y)
 				return this;

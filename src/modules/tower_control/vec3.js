@@ -1,5 +1,3 @@
-const Vec2 = require("./vec2");
-
 module.exports = class Vec3
 {
 	constructor(x, y, z)
@@ -21,7 +19,7 @@ module.exports = class Vec3
 
 	horizontal()
 	{
-		return new Vec2(this.x, this.z);
+		return new (require("./vec2")) (this.x, this.z);
 	}
 
 	length()
@@ -39,7 +37,7 @@ module.exports = class Vec3
 				return this;
 			}
 
-			if(x instanceof Vec3) // TODO: any object with xyz
+			if(x.x != undefined && x.y != undefined && x.z != undefined)
 			{
 				trinaryFunc(x.x, x.y, x.z)
 				return this;
