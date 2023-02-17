@@ -1,0 +1,11 @@
+export const PLAIN_WAIT_PLACE: string = "Plain_Wait_Place";
+export const MY_EXCHANGE_NAME: string = "Handling Supervisor";
+export const MY_EXCHANGE_TYPE: string = "fanout";
+export const MY_QUEUE_NAME: string = "Handling Supervisor";
+export const EXCHANGE_GLOBAL: string = "global";
+export const EXCHANGE_APPROACH_CONTROL: string = "Approach Control";
+export const EXCHANGE_BAGGAGE_TRACTOR: string = "Baggage tractor";
+export const EXCHANGE_INFORMATION_PANEL: string = "Information Panel";
+export const EXCHANGE_REFUELER: string = "Refueler";
+export const EXCHANGE_VISUALIZER: string = "Visualizer";
+export const EXCHANGE_BOARD: string = "Board";

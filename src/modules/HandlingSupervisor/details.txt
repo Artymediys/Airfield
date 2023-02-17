@@ -1,0 +1,22 @@
+// const channel: Channel = await connection.createChannel();
+
+// //Create Exchange
+// await channel.assertExchange(MY_EXCHANGE_NAME, MY_EXCHANGE_TYPE, {
+//   durable: true,
+//   autoDelete: false,
+//   arguments: null,
+// });
+
+// //Create Queue
+// await channel.assertQueue(MY_QUEUE_NAME, {
+//   durable: true,
+//   exclusive: false,
+//   autoDelete: false,
+//   arguments: null,
+// });
+
+// //Binding my Queue to my Exchange
+// await channel.bindQueue(MY_QUEUE_NAME, MY_EXCHANGE_NAME, "");
+
+//Binding my Queue to Exchange - "global"
+// await channel.bindQueue(MY_QUEUE_NAME, "global", "");
