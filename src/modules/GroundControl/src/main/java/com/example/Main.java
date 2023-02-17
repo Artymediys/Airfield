@@ -1,6 +1,6 @@
-package com.example.testrabbitspring;
+package com.example;
 
-import com.example.testrabbitspring.rabbitmq.RabbitMQSender;
+import com.example.rabbitmq.RabbitMQSender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -9,18 +9,18 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 @EnableAutoConfiguration(exclude = {org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration.class})
-public class TestRabbitSpringApplication implements CommandLineRunner {
+public class Main implements CommandLineRunner {
 
     public static void main(String[] args) {
 
 
-        SpringApplication.run(TestRabbitSpringApplication.class, args);
+        SpringApplication.run(Main.class, args);
     }
 
     private final RabbitMQSender rabbitMQSender;
 
     @Autowired
-    public TestRabbitSpringApplication(RabbitMQSender rabbitMQSender) {
+    public Main(RabbitMQSender rabbitMQSender) {
         this.rabbitMQSender = rabbitMQSender;
     }
 

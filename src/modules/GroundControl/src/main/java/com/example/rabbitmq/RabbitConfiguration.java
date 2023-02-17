@@ -1,4 +1,4 @@
-package com.example.testrabbitspring.rabbitmq;
+package com.example.rabbitmq;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;

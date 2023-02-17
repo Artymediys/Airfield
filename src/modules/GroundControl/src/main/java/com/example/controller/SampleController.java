@@ -1,4 +1,4 @@
-package com.example.testrabbitspring.controller;
+package com.example.controller;
 
 import org.springframework.stereotype.Controller;
 

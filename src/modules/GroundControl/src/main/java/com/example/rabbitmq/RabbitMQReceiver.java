@@ -1,4 +1,4 @@
-package com.example.testrabbitspring.rabbitmq;
+package com.example.rabbitmq;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
@@ -19,11 +19,6 @@ public class RabbitMQReceiver {
     public void worker1(String message) {
         log.info("accepted on Ground Control : " + message);
     }
-
-//    @RabbitListener(queues = "globalExchange")
-//    public void worker2(String message) {
-//        log.info("accepted on globalExchange : " + message);
-//    }
 
 
 }

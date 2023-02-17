@@ -1,6 +1,6 @@
-package com.example.testrabbitspring.controller;
+package com.example.controller;
 
-import com.example.testrabbitspring.rabbitmq.RabbitMQSender;
+import com.example.rabbitmq.RabbitMQSender;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
