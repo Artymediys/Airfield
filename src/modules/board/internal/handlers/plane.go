@@ -2,13 +2,13 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
 	"golang.org/x/exp/slog"
 
 	"airfield-board/internal/model"
+	"airfield-board/internal/response"
 	"airfield-board/internal/store"
 )
 
@@ -27,36 +27,47 @@ func Plane(l *slog.Logger, s *store.Plane) http.Handler {
 		req := Req{}
 		err := json.NewDecoder(r.Body).Decode(&req)
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			_, errW := fmt.Fprintf(w, "Failed to decode request body")
-			if errW != nil {
-				l.Error("Failed to write response", errW)
+			l.Error("Failed to decode request", err)
+
+			if errResp := response.JsonError(w, http.StatusBadRequest, response.Message{
+				Error: err.Error(),
+			}); errResp != nil {
+				l.Error("Failed to write response", errResp)
 			}
+
 			return
 		}
 
 		p, err := model.CreatePlanByType(req.PlaneType, req.Flight)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			_, errW := fmt.Fprintf(w, "Failed to create plane: %v", err)
-			if errW != nil {
-				l.Error("Failed to write response", errW)
+			l.Error("Failed to create plane", err)
+
+			if errResp := response.JsonError(w, http.StatusBadRequest, response.Message{
+				Error: err.Error(),
+			}); errResp != nil {
+				l.Error("Failed to write response", errResp)
 			}
+
 			return
 		}
 
 		err = s.SavePlane(p)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			_, errW := fmt.Fprintf(w, "Failed to save plane")
-			if errW != nil {
-				l.Error("Failed to write response", errW)
+			l.Error("Failed to save plane", err)
+
+			if errResp := response.JsonError(w, http.StatusInternalServerError, response.Message{
+				Error: err.Error(),
+			}); errResp != nil {
+				l.Error("Failed to write response", errResp)
 			}
+
 			return
 		}
 
-		_, err = fmt.Fprintf(w, "Plane created: %s", p.ID)
-		if err != nil {
+		if err := response.Json(w, response.Message{
+			PlaneID: p.ID,
+			Message: "OK",
+		}); err != nil {
 			l.Error("Failed to write response", err)
 		}
 	})
@@ -67,26 +78,30 @@ func Plane(l *slog.Logger, s *store.Plane) http.Handler {
 		// Get query params with plane id
 		planeID := r.URL.Query().Get("plane_id")
 		if planeID == "" {
-			w.WriteHeader(http.StatusBadRequest)
-			_, err := fmt.Fprintf(w, "plane_id parameter is required")
-			if err != nil {
-				l.Error("Failed to write response", err)
+			l.Error("Plane id is empty", response.ErrNoPlaneID)
+
+			if errResp := response.JsonError(w, http.StatusBadRequest, response.Message{
+				Error: response.ErrNoPlaneID.Error(),
+			}); errResp != nil {
+				l.Error("Failed to write response", errResp)
 			}
-			return
 		}
 
 		plane, err := s.GetPlane(planeID)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			_, errW := fmt.Fprintf(w, "Failed to get plane")
-			if errW != nil {
-				l.Error("Failed to write response", errW)
+			l.Error("Failed to get plane", err)
+
+			if errResp := response.JsonError(w, http.StatusInternalServerError, response.Message{
+				Error:   err.Error(),
+				PlaneID: planeID,
+			}); errResp != nil {
+				l.Error("Failed to write response", errResp)
 			}
+
 			return
 		}
 
-		_, err = fmt.Fprintf(w, "Hello from get the plane handler! Plane: %v", plane)
-		if err != nil {
+		if err := response.Json(w, plane); err != nil {
 			l.Error("Failed to write response", err)
 		}
 	})

@@ -16,9 +16,9 @@ const (
 var ErrPlaneTypeNotSupported = errors.New("plane type not supported")
 
 type Position struct {
-	X uint
-	Y uint
-	Z uint
+	X int
+	Y int
+	Z int
 }
 
 type Plane struct {
@@ -32,6 +32,8 @@ type Plane struct {
 	MaxPassengers     uint
 	CurrentPassengers uint
 
+	Passengers []string
+
 	MaxCargo     uint
 	CurrentCargo uint
 
@@ -39,6 +41,8 @@ type Plane struct {
 
 	MaxFood     uint
 	CurrentFood uint
+
+	Height uint
 }
 
 func CreatePlanByType(planeType PlaneType, flight string) (*Plane, error) {
@@ -55,6 +59,8 @@ func CreatePlanByType(planeType PlaneType, flight string) (*Plane, error) {
 			CurrentCargo:      100,
 			CurrentFood:       100,
 			Flight:            flight,
+			Passengers:        []string{},
+			Height:            100,
 		}, nil
 	case PlaneTypeCargo:
 		return &Plane{
@@ -66,6 +72,8 @@ func CreatePlanByType(planeType PlaneType, flight string) (*Plane, error) {
 			CurrentFood:   100,
 			MaxPassengers: 0,
 			Flight:        flight,
+			Passengers:    []string{},
+			Height:        100,
 		}, nil
 	default:
 		return nil, ErrPlaneTypeNotSupported

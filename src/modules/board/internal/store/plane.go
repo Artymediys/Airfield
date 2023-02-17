@@ -33,7 +33,7 @@ func (p *Plane) GetPlane(planeID string) (*model.Plane, error) {
 }
 
 func (p *Plane) SavePlane(pl *model.Plane) error {
-	if p == nil {
+	if pl == nil {
 		return ErrSaveEmptyPlane
 	}
 
@@ -50,4 +50,64 @@ func (p *Plane) RemovePlane(planeID string) error {
 	delete(p.store, planeID)
 
 	return nil
+}
+
+func (p *Plane) GetCoords(planeID string) (*model.Position, error) {
+	pl, err := p.GetPlane(planeID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &pl.Position, nil
+}
+
+func (p *Plane) SetCoords(planeID string, pos *model.Position) error {
+	pl, err := p.GetPlane(planeID)
+	if err != nil {
+		return err
+	}
+
+	pl.Position = *pos
+
+	return nil
+}
+
+func (p *Plane) SetPassengers(planeID string, passengers []string) error {
+	pl, err := p.GetPlane(planeID)
+	if err != nil {
+		return err
+	}
+
+	pl.Passengers = passengers
+
+	return nil
+}
+
+func (p *Plane) GetPassengers(planeID string) ([]string, error) {
+	pl, err := p.GetPlane(planeID)
+	if err != nil {
+		return nil, err
+	}
+
+	return pl.Passengers, nil
+}
+
+func (p *Plane) SetHeight(planeID string, height uint) error {
+	pl, err := p.GetPlane(planeID)
+	if err != nil {
+		return err
+	}
+
+	pl.Height = height
+
+	return nil
+}
+
+func (p *Plane) GetHeight(planeID string) (uint, error) {
+	pl, err := p.GetPlane(planeID)
+	if err != nil {
+		return 0, err
+	}
+
+	return pl.Height, nil
 }

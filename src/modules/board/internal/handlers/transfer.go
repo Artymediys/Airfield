@@ -1,21 +1,46 @@
 package handlers
 
 import (
-	"fmt"
+	"encoding/json"
 	"net/http"
 
 	"golang.org/x/exp/slog"
+
+	"airfield-board/internal/response"
 )
 
 func Transfer(l *slog.Logger) http.HandlerFunc {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	type TransferRequest struct {
+		PlaneID  string `json:"plane_id"`
+		Operator string `json:"operator"`
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
 		l.Info("Transfer handler called")
 
-		// body: json { "plane_id": number , "operator": string }
-
-		_, err := fmt.Fprintf(w, "OK")
+		req := TransferRequest{}
+		err := json.NewDecoder(r.Body).Decode(&req)
 		if err != nil {
+			l.Error("Failed to decode request", err)
+
+			errResp := response.JsonError(w, http.StatusBadRequest, response.Message{
+				PlaneID: req.PlaneID,
+				Error:   err.Error(),
+			})
+			if errResp != nil {
+				l.Error("Failed to write response", errResp)
+			}
+
+			return
+		}
+
+		// TODO: implement transfer logic
+
+		if err := response.Json(w, response.Message{
+			PlaneID: req.PlaneID,
+			Message: "OK",
+		}); err != nil {
 			l.Error("Failed to write response", err)
 		}
-	})
+	}
 }

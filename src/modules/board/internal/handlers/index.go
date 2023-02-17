@@ -1,19 +1,21 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 
 	"golang.org/x/exp/slog"
+
+	"airfield-board/internal/response"
 )
 
 func Index(l *slog.Logger) http.HandlerFunc {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
 		l.Info("Index handler called")
 
-		_, err := fmt.Fprintf(w, "Hello from the index handler!")
-		if err != nil {
+		if err := response.Json(w, response.Message{
+			Message: "OK",
+		}); err != nil {
 			l.Error("Failed to write response", err)
 		}
-	})
+	}
 }

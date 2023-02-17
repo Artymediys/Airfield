@@ -15,6 +15,9 @@ type Config struct {
 		Username string `env:"RABBITMQ_USERNAME" envDefault:"guest"`
 		Password string `env:"RABBITMQ_PASSWORD" envDefault:"guest"`
 	}
+	Clients struct {
+		GroundControlURL string `env:"GROUND_CONTROL_URL,required"`
+	}
 }
 
 func New() (*Config, error) {
