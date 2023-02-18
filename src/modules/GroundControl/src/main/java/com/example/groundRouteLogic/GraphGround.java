@@ -1,6 +1,7 @@
 package com.example.groundRouteLogic;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,6 +11,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Slf4j
+@Component
 public class GraphGround {
 
     private static final int MAX_VAL = 10000;
@@ -35,7 +37,7 @@ public class GraphGround {
             {MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, 97, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, 20, 0}
     };
 
-    public static List<Integer> getRouteAlgorithm(int startIndex, int endIndex) {
+    public int[] dijkstraAlgorithm(int startIndex, int endIndex) {
 
         List<Integer> routeCheckPoints = new ArrayList<>();//on exit get route in control points
         int[] minDist = new int[SIZE_GRAPH];// min distance
@@ -80,12 +82,7 @@ public class GraphGround {
                 visitedNodes[minindex] = 0;
             }
         } while (minindex < MAX_VAL);
-        //print
-        log.info("routeTest");
-        for (int i = 0; i < SIZE_GRAPH; i++) {
 
-            System.out.print(" " + (i + 1) + ") " + minDist[i]);
-        }
         //get back check point in route
         routeCheckPoints.add(endPoint + 1);
         int k = 1;
@@ -107,15 +104,19 @@ public class GraphGround {
                 }
             }
         }
+        //fix alg-m
+        if (routeCheckPoints.get(0) == routeCheckPoints.get(1)) {
+            routeCheckPoints.remove(0);
+        }
         //print
         System.out.println();
         log.info("Result in ControlCheckpoints");
 
-        Stream<Integer> streamRoute = routeCheckPoints.stream().
-                collect(reverseOrderCollectionToList());
+        int[] roadMap = routeCheckPoints.stream().
+                collect(reverseOrderCollectionToList()).mapToInt(Integer::intValue).toArray();
         //streamRoute.forEach(s-> System.out.println(s+" "));
 
-        return streamRoute.toList();
+        return roadMap;
     }
 
     //get in reverse order

@@ -1,0 +1,15 @@
+{
+  "type": "name",
+  "transportId": "id",
+  "startPoint": 2,
+  "endPoint": 14
+}
+
+{
+  "transportId": "id",
+  "roadMap": [
+    тут
+    массив
+    int
+  ]
+}
