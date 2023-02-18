@@ -16,7 +16,7 @@ type Config struct {
 		Password string `env:"RABBITMQ_PASSWORD" envDefault:"guest"`
 	}
 	Clients struct {
-		GroundControlURL string `env:"GROUND_CONTROL_URL,required"`
+		GroundControlURL string `env:"GROUND_CONTROL_URL,required" envDefault:"http://localhost:8081"`
 	}
 }
 

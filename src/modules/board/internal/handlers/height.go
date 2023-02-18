@@ -51,7 +51,7 @@ func Height(l *slog.Logger, s *store.Plane) http.Handler {
 			return
 		}
 
-		if err := response.Json(w, response.Message{
+		if err := response.Json(w, http.StatusOK, response.Message{
 			PlaneID: req.PlaneID,
 			Message: "OK",
 		}); err != nil {
@@ -91,7 +91,7 @@ func Height(l *slog.Logger, s *store.Plane) http.Handler {
 			return
 		}
 
-		if err := response.Json(w, HeightDTO{
+		if err := response.Json(w, http.StatusOK, HeightDTO{
 			PlaneID: planeID,
 			Height:  height,
 		}); err != nil {

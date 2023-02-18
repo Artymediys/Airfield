@@ -55,7 +55,7 @@ func Position(l *slog.Logger, s *store.Plane) http.Handler {
 			return
 		}
 
-		if err := response.Json(w, response.Message{
+		if err := response.Json(w, http.StatusOK, response.Message{
 			PlaneID: planeCoords.PlaneID,
 			Message: "OK",
 		}); err != nil {
@@ -78,7 +78,7 @@ func Position(l *slog.Logger, s *store.Plane) http.Handler {
 			return
 		}
 
-		if err := response.Json(w, PositionDTO{
+		if err := response.Json(w, http.StatusOK, PositionDTO{
 			X:       coords.X,
 			Y:       coords.Y,
 			Z:       coords.Z,

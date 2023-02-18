@@ -11,17 +11,17 @@ var (
 )
 
 type Message struct {
-	PlaneID string `json:"plane_id"`
+	PlaneID string `json:"plane_id,omitempty"`
 	Message string `json:"message,omitempty"`
 	Error   string `json:"error,omitempty"`
 }
 
-func Json(w http.ResponseWriter, data any) error {
+func Json(w http.ResponseWriter, code int, data any) error {
 	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(code)
 	return json.NewEncoder(w).Encode(data)
 }
 
 func JsonError(w http.ResponseWriter, code int, data any) error {
-	w.WriteHeader(code)
-	return Json(w, data)
+	return Json(w, code, data)
 }

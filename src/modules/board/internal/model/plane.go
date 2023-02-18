@@ -2,6 +2,7 @@ package model
 
 import (
 	"errors"
+	"math/rand"
 
 	"github.com/google/uuid"
 )
@@ -12,6 +13,11 @@ const (
 	PlaneTypePassenger PlaneType = "Passenger"
 	PlaneTypeCargo     PlaneType = "Cargo"
 )
+
+func GetRandomType() PlaneType {
+	types := []PlaneType{PlaneTypePassenger, PlaneTypeCargo}
+	return types[rand.Intn(len(types))]
+}
 
 var ErrPlaneTypeNotSupported = errors.New("plane type not supported")
 

@@ -64,7 +64,7 @@ func Plane(l *slog.Logger, s *store.Plane) http.Handler {
 			return
 		}
 
-		if err := response.Json(w, response.Message{
+		if err := response.Json(w, http.StatusOK, response.Message{
 			PlaneID: p.ID,
 			Message: "OK",
 		}); err != nil {
@@ -85,6 +85,8 @@ func Plane(l *slog.Logger, s *store.Plane) http.Handler {
 			}); errResp != nil {
 				l.Error("Failed to write response", errResp)
 			}
+
+			return
 		}
 
 		plane, err := s.GetPlane(planeID)
@@ -101,7 +103,7 @@ func Plane(l *slog.Logger, s *store.Plane) http.Handler {
 			return
 		}
 
-		if err := response.Json(w, plane); err != nil {
+		if err := response.Json(w, http.StatusOK, plane); err != nil {
 			l.Error("Failed to write response", err)
 		}
 	})

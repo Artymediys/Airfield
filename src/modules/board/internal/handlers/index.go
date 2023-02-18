@@ -12,7 +12,7 @@ func Index(l *slog.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		l.Info("Index handler called")
 
-		if err := response.Json(w, response.Message{
+		if err := response.Json(w, http.StatusOK, response.Message{
 			Message: "OK",
 		}); err != nil {
 			l.Error("Failed to write response", err)

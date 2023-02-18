@@ -35,7 +35,7 @@ func PlaneOutOfZone(l *slog.Logger) http.HandlerFunc {
 
 		// TODO: implement plane out of zone logic
 
-		if err := response.Json(w, response.Message{
+		if err := response.Json(w, http.StatusOK, response.Message{
 			PlaneID: req.PlaneID,
 			Message: "OK",
 		}); err != nil {

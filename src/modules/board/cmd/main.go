@@ -1,6 +1,7 @@
 package main
 
 import (
+	"math/rand"
 	"time"
 
 	"github.com/streadway/amqp"
@@ -8,6 +9,7 @@ import (
 	"airfield-board/internal/app"
 	"airfield-board/internal/config"
 	"airfield-board/internal/log"
+	"airfield-board/internal/model"
 	"airfield-board/internal/router"
 	"airfield-board/internal/store"
 )
@@ -43,6 +45,8 @@ func main() {
 		_ = ch.Close()
 	}(ch)
 
+	store.RMQChannel = ch
+
 	err = ch.ExchangeDeclare("board", "direct", true, false, false, false, nil)
 	if err != nil {
 		lgr.Error("Failed to declare an exchange", err)
@@ -61,17 +65,28 @@ func main() {
 		return
 	}
 
-	go func(ch *amqp.Channel) {
-		<-time.After(2 * time.Second)
+	go func() {
+		ticker := time.NewTicker(30 * time.Second)
+		min := 0
+		max := 30
 
-		errCh := ch.Publish("board", "plane", false, false, amqp.Publishing{
-			Body: []byte(`{"id": 1, "name": "plane1"}`),
-		})
-		if errCh != nil {
-			lgr.Error("Failed to publish message", errCh)
-			return
+		select {
+		case <-ticker.C:
+			lgr.Info("generate airplane")
+			time.Sleep(time.Duration(rand.Intn(max-min)+min) * time.Second)
+
+			p, err := model.CreatePlanByType(model.GetRandomType(), "")
+			if err != nil {
+				lgr.Error("Failed to create plain", err)
+				return
+			}
+
+			if err := planeStore.SavePlane(p); err != nil {
+				lgr.Error("failed to save plain", err)
+			}
 		}
-	}(ch)
+
+	}()
 
 	// read from queue
 	consumeStream, err := ch.Consume("plane", "board", true, false, false, false, nil)
