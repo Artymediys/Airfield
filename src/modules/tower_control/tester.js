@@ -41,7 +41,20 @@ function setup(towerController, planeManager, approachControl)
 		}
 
 		return Promise.reject();
-	}
+	};
+
+	planeManager.setPlaneDestination = (plane, pos) =>
+	{
+		const ourPlane = allPlanes.get(plane.id);
+
+		if(ourPlane)
+		{
+			ourPlane.dest = pos.copy();
+			return Promise.resolve();
+		}
+
+		return Promise.reject();
+	};
 
 	setInterval(() =>
 	{

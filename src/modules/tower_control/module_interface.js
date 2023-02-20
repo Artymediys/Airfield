@@ -56,8 +56,6 @@ class PlaneManager
 
 	async updatePlane(plane)
 	{
-		console.log("abab");
-		console.log(await Promise.resolve("sus"));
 		const data = await this.getPlaneData(plane.id);
 		plane.pos = new Vec3(data.x, data.y, data.z);
 		plane.speed = data.speed;

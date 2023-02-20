@@ -5,9 +5,27 @@ const Main = require("../main");
 
 /* ==================== */
 
+function getColorForPlane(plane)
+{
+	if(plane.pos.y <= 250)
+	{
+		return "#ff0000";
+	}
+	if(plane.pos.y <= 450)
+	{
+		return "#ff8400";
+	}
+	if(plane.pos.y < 650)
+	{
+		return "#ffe100";
+	}
+
+	return "#ff00aa";
+}
+
 function renderPlane(painter, plane)
 {
-	painter.setFillColor("#e00000");
+	painter.setFillColor(getColorForPlane(plane));
 	painter.beginPath();
 	painter.arc(plane.pos.horizontal(), 10, 0, 2 * Math.PI);
 	painter.fill();
@@ -56,10 +74,13 @@ function render(self, painter)
 function setupWindow()
 {
 	const win = Gui.Window.create({});
-	win.setAlwaysOnTop(true);
 	win.setContentSize({ width: 800, height: 600 });
 	win.setResizable(false);
-	win.onClose = () => Gui.MessageLoop.quit();
+	win.onClose = () =>
+	{
+		Gui.MessageLoop.quit();
+		process.exit(0);
+	};
 	win.activate();
 	return win;
 }
@@ -67,7 +88,7 @@ function setupWindow()
 function setupView(window, fps)
 {
 	const view = Gui.Container.create();
-	//view.setMouseDownCanMoveWindow(true);
+	view.setMouseDownCanMoveWindow(true);
 	view.onDraw = render;
 	window.setContentView(view);
 	setInterval(() => view.schedulePaint(), 1000 / fps);
@@ -80,10 +101,19 @@ function setupView(window, fps)
 
 const win = setupWindow();
 const view = setupView(win, 40);
+global.mainWindow = win;
 
 
 
 /* ==================== */
 
+<<<<<<< Updated upstream
 // Gui.MessageLoop.run(); // block until gui.MessageLoop.quit() is called
 // process.exit(0);
+=======
+if (!process.versions.yode && !process.versions.electron)
+{
+	Gui.MessageLoop.run();
+	process.exit(0);
+}
+>>>>>>> Stashed changes

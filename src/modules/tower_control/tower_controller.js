@@ -45,6 +45,8 @@ module.exports = class TowerController
 			return;
 		}
 
+		console.log("ADDED", targetData);
+
 		plane.setDestination(targetData[0], true);
 		this.circuit.addPlaneToEchelon(plane, targetData[1]);
 	}
