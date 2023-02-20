@@ -33,7 +33,7 @@ async function run() {
     console.log("Exchange asserted!")
 
     const twQueue = await channel.assertQueue(Queue);
-    console.log("Exchange asserted!")
+    console.log("Queue asserted!")
 
     await channel.bindQueue(twQueue.queue, Exchange.name, "");
     await channel.bindQueue(twQueue.queue, "global", "");
