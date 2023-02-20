@@ -85,5 +85,5 @@ const view = setupView(win, 40);
 
 /* ==================== */
 
-Gui.MessageLoop.run(); // block until gui.MessageLoop.quit() is called
-process.exit(0);
+// Gui.MessageLoop.run(); // block until gui.MessageLoop.quit() is called
+// process.exit(0);
