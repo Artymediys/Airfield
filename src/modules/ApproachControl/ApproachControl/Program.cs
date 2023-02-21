@@ -13,7 +13,9 @@ namespace ApproachControl
 {
 	class Rabbit
 	{
-		public Rabbit()
+        IModel channel;
+        string name = "Approach Control";
+        public Rabbit()
 		{
 			// Подключение к RabbitMo
 			var factory = new ConnectionFactory
@@ -50,9 +52,6 @@ namespace ApproachControl
 				routingKey: name
 				);
 		}
-		IModel channel;
-		string name = "Approach Control";
-
 		public void Send(string message, string direction)
 		{
 			//Отправка сообщения Visualizer, означающее, что вы подключились
@@ -139,11 +138,10 @@ namespace ApproachControl
 
 		public HttpRequestMessage GetCordRequest(Board board)
 		{
-			Board request = new Board();
-			request.SetStateForJSON(board.plane_id);
-			string jsonString = JsonSerializer.Serialize<Board>(request, options);
-			HttpRequestMessage msg = new HttpRequestMessage(HttpMethod.Get, jsonString);//Тарас подшамань
-			msg.Headers.Add(name, "/current_cord?");
+			string header = "/current_cord?id=" + board.plane_id;
+			string? body = null;
+            HttpRequestMessage msg = new HttpRequestMessage(HttpMethod.Get, body);//Тарас подшамань
+			msg.Headers.Add(name, header);
 			return msg;
 		}//GET /current_cord?id=...
 
@@ -166,8 +164,6 @@ namespace ApproachControl
 
 		void RouteCalculating(Board board)
 		{
-
-
 			//GetCordRequest(board);
 		}//Просчет маршрута движения самолетов для передачи на круг и для вывода за пределы зоны покрытия
 
@@ -211,11 +207,7 @@ namespace ApproachControl
 			boarder.plane_id = "1212";
 			string test = board.GetCordRequest(boarder).ToString();
 			Console.WriteLine(test);
-
 			// Создание списка самолетов
-
 		}
 	}
-
-	
 }
