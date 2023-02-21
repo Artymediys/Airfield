@@ -51,3 +51,5 @@ B:\git\Airfield\src\modules\ApproachControl\ApproachControl\obj\Debug\net6.0\App
 B:\git\Airfield\src\modules\ApproachControl\ApproachControl\obj\Debug\net6.0\ref\ApproachControl.dll
 B:\git\Airfield\src\modules\ApproachControl\ApproachControl\bin\Debug\net6.0\Newtonsoft.Json.dll
 B:\git\Airfield\src\modules\ApproachControl\ApproachControl\bin\Debug\net6.0\Newtonsoft.Json.Bson.dll
+D:\Airfield\src\modules\ApproachControl\ApproachControl\bin\Debug\net6.0\Newtonsoft.Json.dll
+D:\Airfield\src\modules\ApproachControl\ApproachControl\bin\Debug\net6.0\Newtonsoft.Json.Bson.dll
