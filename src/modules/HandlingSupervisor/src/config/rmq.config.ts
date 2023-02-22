@@ -7,6 +7,7 @@ import {
 } from "../common/constants.js";
 
 export class RMQConnection {
+  public log: string;
   private isConnected: boolean = false;
   private settings: Options.Connect;
   public channel: Channel;
@@ -24,6 +25,8 @@ export class RMQConnection {
     try {
       this.isConnected = true;
       const connection: client.Connection = await client.connect(this.settings);
+
+      // this.log = "Successfull connection to RMQ server";
 
       // Create channel
       this.channel = await connection.createChannel();
@@ -45,6 +48,7 @@ export class RMQConnection {
 
       // Binding my Queue to my Exchange
       await this.channel.bindQueue(MY_QUEUE_NAME, MY_EXCHANGE_NAME, "");
+      await this.channel.bindQueue(MY_QUEUE_NAME, "global", "");
 
       return this.channel;
     } catch (err) {
@@ -52,12 +56,12 @@ export class RMQConnection {
     }
   }
 
-  public async send(exchangeName: string, message: Object) {
-    this.channel.publish(
-      exchangeName,
-      "",
-      Buffer.from(JSON.stringify(message))
-    );
+  public async send(exchangeName: string, message: any) {
+    try {
+      this.channel.publish(exchangeName, "", Buffer.from(String(message)));
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   public async receive(
@@ -65,7 +69,11 @@ export class RMQConnection {
     onMessage: (msg: Message | null) => any,
     options?: Options.Consume
   ) {
-    return await this.channel.consume(myQueue, onMessage, options);
+    try {
+      return await this.channel.consume(myQueue, onMessage, options);
+    } catch (err) {
+      console.log(err);
+    }
   }
 }
 

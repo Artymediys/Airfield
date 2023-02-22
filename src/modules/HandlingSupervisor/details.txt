@@ -20,3 +20,6 @@
 
 //Binding my Queue to Exchange - "global"
 // await channel.bindQueue(MY_QUEUE_NAME, "global", "");
+
+
+STATE = ACTIVE | FREE 

@@ -1,7 +1,7 @@
 import { Message } from "amqplib";
-import { IBoard } from "src/interfaces/board/board.interface.js";
-import { MY_QUEUE_NAME } from "../common/constants.js";
-import { rmq } from "../main.js";
+import { IBoard } from "./interfaces/board.interface.js";
+import { MY_QUEUE_NAME } from "../../common/constants.js";
+import { rmq } from "../../main.js";
 
 export class BoardService {
   async getMessage() {
@@ -15,9 +15,9 @@ export class BoardService {
     }
   }
 
-  async sendMessage(board: IBoard) {
+  async sendMessage(board: Object) {
     try {
-      return await rmq.send(MY_QUEUE_NAME, board);
+      return await rmq.send(MY_QUEUE_NAME, Buffer.from(JSON.stringify(board)));
     } catch (err) {
       console.log(err);
     }
