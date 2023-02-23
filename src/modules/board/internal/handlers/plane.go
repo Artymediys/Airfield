@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/go-chi/chi/v5"
 	"golang.org/x/exp/slog"
@@ -16,15 +17,15 @@ func Plane(l *slog.Logger, s *store.Plane) http.Handler {
 	r := chi.NewRouter()
 
 	r.Post("/", func(w http.ResponseWriter, r *http.Request) {
-		type Req struct {
-			PlaneType model.PlaneType `json:"plane_type"`
-			Flight    string          `json:"flight"`
+		type CreateReq struct {
+			NumOfPeople int `json:"num_of_people"`
+			FlightID    int `json:"flight_id"`
+			Time        int `json:"time"` // через сколько секунд должен вылететь
 		}
 
 		l.Info("Plane handler called")
 
-		// body: json { "plane_type": string , "flight": string }
-		req := Req{}
+		req := CreateReq{}
 		err := json.NewDecoder(r.Body).Decode(&req)
 		if err != nil {
 			l.Error("Failed to decode request", err)
@@ -38,7 +39,7 @@ func Plane(l *slog.Logger, s *store.Plane) http.Handler {
 			return
 		}
 
-		p, err := model.CreatePlanByType(req.PlaneType, req.Flight)
+		p, err := model.CreatePlanByType(model.PlaneTypeCargo, strconv.Itoa(req.FlightID))
 		if err != nil {
 			l.Error("Failed to create plane", err)
 
@@ -51,7 +52,7 @@ func Plane(l *slog.Logger, s *store.Plane) http.Handler {
 			return
 		}
 
-		err = s.SavePlane(p)
+		err = s.SavePlane(nil, p)
 		if err != nil {
 			l.Error("Failed to save plane", err)
 
@@ -64,9 +65,10 @@ func Plane(l *slog.Logger, s *store.Plane) http.Handler {
 			return
 		}
 
-		if err := response.Json(w, http.StatusOK, response.Message{
-			PlaneID: p.ID,
-			Message: "OK",
+		if err := response.Json(w, http.StatusOK, map[string]any{
+			"created":   true,
+			"flight_id": req.FlightID,
+			"plane_id":  p.ID,
 		}); err != nil {
 			l.Error("Failed to write response", err)
 		}

@@ -7,6 +7,7 @@ import (
 
 	"github.com/streadway/amqp"
 
+	"airfield-board/internal/config"
 	"airfield-board/internal/model"
 )
 
@@ -61,20 +62,20 @@ func (p *Plane) GetPlane(planeID string) (*model.Plane, error) {
 }
 
 type PlaneCreationEvent struct {
-	System string `json:"system,omitempty"`
-	ID     string `json:"id,omitempty"`
-	Type   string `json:"type,omitempty"`
+	Sender string `json:"sender"`
+	ID     string `json:"id"`
+	Type   string `json:"type"`
 }
 
-const systemName = "Board"
+const senderName = "Board"
 
-func (p *Plane) SavePlane(pl *model.Plane) error {
+func (p *Plane) SavePlane(cfg *config.Config, pl *model.Plane) error {
 	if pl == nil {
 		return ErrSaveEmptyPlane
 	}
 
 	event := PlaneCreationEvent{
-		System: systemName,
+		Sender: senderName,
 		ID:     pl.ID,
 		Type:   string(pl.Type),
 	}
@@ -91,6 +92,9 @@ func (p *Plane) SavePlane(pl *model.Plane) error {
 	}
 
 	p.store[pl.ID] = pl
+
+	// Start plane lifecycle
+	go pl.Start(cfg)
 
 	return nil
 }

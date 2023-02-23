@@ -24,7 +24,7 @@ func GroundControlGetMap(url string, planeID string) ([]int, error) {
 	req := GroundControlRequest{
 		Type:       "Board",
 		PlaneID:    planeID,
-		StartPoint: 2,
+		StartPoint: 8,
 		EndPoint:   14,
 	}
 

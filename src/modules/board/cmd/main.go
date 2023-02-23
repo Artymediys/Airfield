@@ -65,8 +65,35 @@ func main() {
 		return
 	}
 
+	if err = ch.Publish("Visualizer", "Visualizer", false, false, amqp.Publishing{
+		Body: []byte("Board"),
+	}); err != nil {
+		lgr.Error("can't connect", err)
+		return
+	}
+
+	_, err = ch.QueueDeclare("board_start", false, true, false, false, nil)
+	if err != nil {
+		lgr.Error("can't declare", err)
+		return
+	}
+
+	err = ch.QueueBind("board_start", "board_start", "global", false, nil)
+	if err != nil {
+		lgr.Error("Failed to bind a queue", err)
+		return
+	}
+	consumeStart, err := ch.Consume("board_start", "board_super_board_start", true, false, false, false, nil)
+	if err != nil {
+		return
+	}
+
+	start := <-consumeStart
+	// check start message :)
+	lgr.Info(string(start.Body))
+
 	go func() {
-		ticker := time.NewTicker(30 * time.Second)
+		ticker := time.NewTicker(10 * time.Second)
 		min := 0
 		max := 30
 
@@ -81,7 +108,7 @@ func main() {
 				return
 			}
 
-			if err := planeStore.SavePlane(p); err != nil {
+			if err := planeStore.SavePlane(cfg, p); err != nil {
 				lgr.Error("failed to save plain", err)
 			}
 		}

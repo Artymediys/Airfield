@@ -2,9 +2,14 @@ package model
 
 import (
 	"errors"
+	"fmt"
 	"math/rand"
 
 	"github.com/google/uuid"
+	"golang.org/x/exp/slog"
+
+	"airfield-board/internal/clients"
+	"airfield-board/internal/config"
 )
 
 type PlaneType string
@@ -84,4 +89,22 @@ func CreatePlanByType(planeType PlaneType, flight string) (*Plane, error) {
 	default:
 		return nil, ErrPlaneTypeNotSupported
 	}
+}
+
+func (p *Plane) Start(cfg *config.Config) {
+	// Perform lifecycle there
+	// Listen to messages in plane and perform actions
+	// ?
+
+	slog.Info("Plane lifecycle started", slog.Group("plane", slog.String("id", p.ID)))
+
+	slog.Info("Plane landed")
+
+	roadMap, err := clients.GroundControlGetMap(fmt.Sprintf("%s/ground-control/road-map/board", cfg.Clients.GroundControlURL), p.ID)
+	if err != nil {
+		slog.Error("Can't get roadMap", err)
+		return
+	}
+
+	slog.Info("Got new roadMap", slog.Any("map", roadMap))
 }
