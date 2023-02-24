@@ -1,7 +1,9 @@
 export const parser = (req: string) => {
-  console.log("PARSER------------", req);
+  try {
+    const json = JSON.parse(req);
 
-  const json = JSON.parse(req);
-
-  console.log(json.sender);
+    return json.sender;
+  } catch (error) {
+    console.log(error);
+  }
 };

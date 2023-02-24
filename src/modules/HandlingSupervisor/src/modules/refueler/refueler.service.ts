@@ -1,1 +1,3 @@
-export class RefuelerService {}
+export class RefuelerService {
+  constructor(msg: string) {}
+}

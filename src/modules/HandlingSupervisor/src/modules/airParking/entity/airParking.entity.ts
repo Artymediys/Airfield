@@ -1,23 +1,61 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
-import { IAirParking } from "../interfaces/airParking.interface.js";
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToMany,
+  OneToOne,
+  PrimaryColumn,
+  PrimaryGeneratedColumn,
+} from "typeorm";
+import { Board } from "../../../modules/board/entity/board.entity.js";
+import { Refueler } from "../../../modules/refueler/entity/refueler.entity.js";
+import { BaggageTractor } from "../../../modules/baggageTractor/entity/baggageTractor.enity.js";
+import { PassBus } from "../../../modules/passBus/entity/passBus.entity.js";
+import { VipBus } from "../../../modules/vipBus/entity/vipBus.entity.js";
+import { FollowMe } from "../../../modules/followMe/entity/followMe.entity.js";
 
 @Entity()
 export class AirParking {
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryColumn()
   id: string;
 
-  @Column({ nullable: true })
-  board?: string;
+  @OneToOne(() => Board, (board) => board.plain_id, {
+    onDelete: "CASCADE",
+    eager: true,
+  })
+  @JoinColumn()
+  board?: Board;
 
-  @Column({ nullable: true })
-  refueler?: string;
+  @OneToOne(() => FollowMe, (followMe) => followMe.airParking, {
+    onDelete: "CASCADE",
+    eager: true,
+  })
+  @JoinColumn()
+  followMe?: FollowMe;
 
-  @Column({ nullable: true })
-  baggageTractor?: string;
+  @OneToOne(() => Refueler, (refueler) => refueler.id, {
+    onDelete: "CASCADE",
+    eager: true,
+  })
+  @JoinColumn()
+  refueler?: Refueler;
 
-  @Column("simple-array", { nullable: true })
-  passBus: string;
+  @OneToOne(() => BaggageTractor, (baggageTractor) => baggageTractor.id, {
+    onDelete: "CASCADE",
+    eager: true,
+  })
+  @JoinColumn()
+  baggageTractor?: BaggageTractor;
 
-  @Column({ nullable: true })
-  vipBus: string;
+  @OneToMany(() => PassBus, (passBus) => passBus.airParking, {
+    cascade: true,
+  })
+  passBus?: PassBus[];
+
+  @OneToOne(() => VipBus, (vipBus) => vipBus.id, {
+    onDelete: "CASCADE",
+    eager: true,
+  })
+  @JoinColumn()
+  vipBus?: VipBus;
 }

@@ -1,10 +1,21 @@
 import { Message } from "amqplib";
 import { MY_EXCHANGE_NAME, MY_QUEUE_NAME } from "./common/constants.js";
+import express, { Express } from "express";
 import { ORMConnection } from "./config/orm.config.js";
 import { RMQConnection } from "./config/rmq.config.js";
-import { Emitter } from "./emitter/emitter.js";
 import { parser } from "./helper/parser.js";
-import { BoardService } from "./modules/board/board.service.js";
+import boardService from "./modules/board/board.service.js";
+import refuelerRouter from "./modules/refueler/refueler.route.js";
+import followMeRouter from "./modules/followMe/followMe.route.js";
+import airParkingRouter from "./modules/airParking/airParking.route.js";
+import { IBoardMessage } from "./modules/board/interfaces/board.interface.js";
+
+const app: Express = express();
+
+app.use(express.json());
+app.use("", refuelerRouter);
+app.use("", followMeRouter);
+app.use("", airParkingRouter);
 
 export const rmq: RMQConnection = new RMQConnection({
   hostname: "178.20.43.80",
@@ -13,9 +24,7 @@ export const rmq: RMQConnection = new RMQConnection({
   password: "guest",
 });
 
-async function Start() {
-  await rmq.init();
-
+const startApp = async () => {
   await ORMConnection.initialize()
     .then(() => {
       console.log("Data Source has been initialized!\n");
@@ -24,43 +33,68 @@ async function Start() {
       console.error("Error during Data Source initialization - ", err);
     });
 
+  app.listen(4444, async () => {
+    console.log(`Server is running at http://localhost:4444`);
+  });
+};
+
+async function Start() {
+  try {
+    await rmq.init();
+  } catch (error) {
+    console.log(error);
+  }
+  // let sender: string = "";
+
   rmq.send("Visualizer", MY_EXCHANGE_NAME);
 
-  const toStart = await rmq.channel.consume(
-    MY_QUEUE_NAME,
-    (msg: Message | null) => {
-      parser(msg.content.toString());
-      rmq.channel.ack(msg);
-      return msg.content.toString();
-    }
-  );
+  // const toStart = await rmq.channel.consume(
+  //   MY_QUEUE_NAME,
+  //   (msg: Message | null): string | null => {
+  //     return msg.content.toString();
+  //   },
+  //   {
+  //     noAck: true,
+  //   }
+  // );
 
-  if (String(toStart) === "Start") {
-  }
-
-  const boardService = new BoardService();
-
-  await boardService.sendMessage({
-    machineId: "FM1",
-    sender: "Follow Me",
-    from: "FmGarage_1",
-    isArrived: true,
-  });
-  await boardService.getMessage();
+  // if (String(toStart) === "Start") {
+  //   return;
+  // }
 }
 
+const getMes = async () => {
+  while (true) {
+    let message: string = await rmq.getMessage(MY_QUEUE_NAME);
+    let sender: string = parser(message);
+
+    // console.log("Sender --- ", sender);
+    // console.log(message);
+
+    switch (sender) {
+      case "Board":
+        boardService.createBoard(message as unknown as IBoardMessage);
+        break;
+      case "Follow Me":
+        console.log("Follow Me");
+        break;
+      case "Refueler":
+        break;
+      case "Passenger Bus":
+        console.log("Passenger Bus");
+        break;
+      case "Vip Bus":
+        console.log("Vip Bus");
+        break;
+      case "Baggage tractor":
+        console.log("Baggage tractor");
+        break;
+      default:
+        console.log("DEFAULT");
+    }
+  }
+};
+
+await startApp();
 await Start();
-
-// emitter.on("main_event", (obj: typeof objTest) => {
-//   console.log("Emitter ON - ", obj);
-// });
-
-// emitter.log("User Logged");
-
-// channel.publish("Visualizer", "", Buffer.from(MY_EXCHANGE_NAME));
-
-//Binding my Queue to Exchange - "global"
-// await channel.bindQueue(MY_QUEUE_NAME, "global", "");
-
-// await channel.close();
-// await connect.close();
+await getMes();

@@ -18,11 +18,11 @@ export class RMQConnection {
   }
 
   public async init(): Promise<Channel> {
-    if (this.isConnected) {
-      return;
-    }
-
     try {
+      if (this.isConnected) {
+        return;
+      }
+
       this.isConnected = true;
       const connection: client.Connection = await client.connect(this.settings);
 
@@ -56,25 +56,41 @@ export class RMQConnection {
     }
   }
 
-  public async send(exchangeName: string, message: any) {
+  public send(exchangeName: string, message: any) {
     try {
-      this.channel.publish(exchangeName, "", Buffer.from(String(message)));
+      return this.channel.publish(
+        exchangeName,
+        "",
+        Buffer.from(String(message))
+      );
     } catch (err) {
       console.log(err);
     }
   }
 
-  public async receive(
-    myQueue: string,
-    onMessage: (msg: Message | null) => any,
-    options?: Options.Consume
-  ) {
+  public getMessage(myQueue: string): Promise<string | null | undefined> {
     try {
-      return await this.channel.consume(myQueue, onMessage, options);
-    } catch (err) {
-      console.log(err);
+      return new Promise<string | null | undefined>((resolve: any) => {
+        this.channel.consume(myQueue, (msg: Message | null): string | null =>
+          resolve(msg.content.toString(), this.channel.ack(msg))
+        );
+      });
+    } catch (error) {
+      console.log(error);
     }
   }
+
+  // public async receive(
+  //   myQueue: string,
+  //   onMessage: (msg: Message | null) => any,
+  //   options?: Options.Consume
+  // ) {
+  //   try {
+  //     return await this.channel.consume(myQueue, onMessage, options);
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // }
 }
 
 //////////////////////////////////

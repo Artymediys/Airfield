@@ -22,4 +22,19 @@
 // await channel.bindQueue(MY_QUEUE_NAME, "global", "");
 
 
+// emitter.on("main_event", (obj: typeof objTest) => {
+//   console.log("Emitter ON - ", obj);
+// });
+
+// emitter.log("User Logged");
+
+// channel.publish("Visualizer", "", Buffer.from(MY_EXCHANGE_NAME));
+
+//Binding my Queue to Exchange - "global"
+// await channel.bindQueue(MY_QUEUE_NAME, "global", "");
+
+// await channel.close();
+// await connect.close();
+
+
 STATE = ACTIVE | FREE 
