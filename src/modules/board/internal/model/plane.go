@@ -92,15 +92,33 @@ func CreatePlanByType(planeType PlaneType, flight string) (*Plane, error) {
 }
 
 func (p *Plane) Start(cfg *config.Config) {
-	// Perform lifecycle there
-	// Listen to messages in plane and perform actions
-	// ?
+	/* LIFE CYCLE
+	1. Самолет создан (сам или по запросу табло) и типа летит в сторону аэропорта
+		Когда создан – запрашиваем у Пассажиров список id пассажиров
+	2. Visualizer присылает нам, когда мы в зоне Диспетчера подхода
+	3. Связываемся с ними и спрашиваем, можем ли сесть:
+		Если да – отправляем сообщение Visualizer'у, что можем садится
+		Если нет – отправляем сообщение Visualizer'у, что нужно сделать круг
+	4. Когда самолет сел – получаем сообщение от Visualizer'а и делаем запрос к Управление наземным обслуживанием
+	для машинки Follow me и дальнейшего обслуживания
+	5. При прибытии на стоянку – отдаем пассажиров и багаж
+	6. Отправляем Коле при начале обслуживания наше местоположение
+	7. Когда обслуживание закончено получаем новых пассажиров, топливо, багаж и еду.
+	8. Запрашиваем у Коли маршрут движение по аэропорту до взлетной полосы
+	9. На каждой контрольной точки запрашиваем можно ли продолжить движение:
+		Если нельзя – ждем,
+		Если можно говорим visualizer'у куда нам двигаться и когда проехали отрезок – пишем Коле, что мы свалили с отрезка
+	10. Когда приехали до конца маршрута (взлетной полосы) – делаем запрос на взлет
+	11. Когда можем взлетать – говорим Visualizer'у, что нужно отобразить взлет
+	12. Говорим диспетчеру подхода, что взлетели
+	13. Получаем от Visualizer'а сообщение о том, что самолет улетел и завершаем жизненный цикл самолета
+	*/
 
 	slog.Info("Plane lifecycle started", slog.Group("plane", slog.String("id", p.ID)))
 
 	slog.Info("Plane landed")
 
-	roadMap, err := clients.GroundControlGetMap(fmt.Sprintf("%s/ground-control/road-map/board", cfg.Clients.GroundControlURL), p.ID)
+	roadMap, err := clients.GroundControlGetMap(fmt.Sprintf("%s/ground-control/road-map", cfg.Clients.GroundControlURL), p.ID)
 	if err != nil {
 		slog.Error("Can't get roadMap", err)
 		return
