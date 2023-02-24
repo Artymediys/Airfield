@@ -1,5 +1,5 @@
-const Vec2 = require("./vec2");
-const Plane = require("./module_interface").Plane;
+const Vec2 = require("../util/vec2");
+const Plane = require("./plane");
 
 module.exports = class TrafficCircuit
 {

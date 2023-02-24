@@ -1,5 +1,4 @@
-const Vec2 = require("./vec2");
-const ModuleInterface = require("./module_interface");
+const Vec2 = require("../util/vec2");
 const TrafficCircuit = require("./traffic_circuit");
 
 module.exports = class TowerController

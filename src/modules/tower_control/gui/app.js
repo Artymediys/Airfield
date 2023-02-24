@@ -1,5 +1,5 @@
 const Gui = require("gui");
-const Main = require("../main");
+const Main = require("../module/main");
 
 
 
@@ -105,15 +105,8 @@ global.mainWindow = win;
 
 
 
-/* ==================== */
-
-<<<<<<< Updated upstream
-// Gui.MessageLoop.run(); // block until gui.MessageLoop.quit() is called
-// process.exit(0);
-=======
 if (!process.versions.yode && !process.versions.electron)
 {
 	Gui.MessageLoop.run();
 	process.exit(0);
 }
->>>>>>> Stashed changes

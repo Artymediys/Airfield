@@ -1,5 +1,7 @@
-const Vec3 = require("./vec3");
-const ModuleInterface = require("./module_interface");
+const Vec3 = require("../util/vec3");
+const Plane = require("../module/plane");
+
+
 
 // Returns a random number between min (inclusive) and max (exclusive)
 function getRandom(min, max)
@@ -15,6 +17,8 @@ function getRandomInt(min, max)
 	return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+
+
 function toData(plane)
 {
 	return {
@@ -29,11 +33,13 @@ function toData(plane)
 	}
 }
 
-function setup(towerController, planeManager, approachControl)
+
+
+function setup(towerController, interface)
 {
 	const allPlanes = new Map();
 
-	planeManager.getPlaneData = id =>
+	interface.planeManager.getPlaneData = id =>
 	{
 		if(allPlanes.has(id))
 		{
@@ -43,7 +49,7 @@ function setup(towerController, planeManager, approachControl)
 		return Promise.reject();
 	};
 
-	planeManager.setPlaneDestination = (plane, pos) =>
+	interface.planeManager.setPlaneDestination = (plane, pos) =>
 	{
 		const ourPlane = allPlanes.get(plane.id);
 
@@ -75,8 +81,8 @@ function setup(towerController, planeManager, approachControl)
 			return;
 		}
 
-		const plane = new ModuleInterface.Plane(
-			planeManager,
+		const plane = new Plane(
+			interface.planeManager,
 			id,
 			new Vec3(
 				getRandom(-towerController.circuit.width / 2, towerController.circuit.width / 2),
@@ -87,10 +93,12 @@ function setup(towerController, planeManager, approachControl)
 
 		allPlanes.set(plane.id, plane);
 
-		approachControl.emit("transfer_plane", plane.id);
+		interface.approachControl.emit("transfer_plane", plane.id);
 
 	}, 3 * 1000);
 }
+
+
 
 module.exports = {
 	setup

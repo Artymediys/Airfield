@@ -1,52 +1,18 @@
-const Vec3 = require("./vec3");
+const Vec3 = require("../util/vec3");
+const Plane = require("../module/plane");
 const EventEmitter = require("events").EventEmitter;
 
-class Plane
-{
-	constructor(manager, id, pos, speed)
-	{
-		this._manager = manager;
 
-		this.id = id;
-		this.pos = pos;
-		this.speed = speed;
-	}
-
-	copy()
-	{
-		const planeCopy = new Plane(this._manager, this.id, this.pos.copy(), this.speed);
-		
-		if(this.dest)
-		{
-			planeCopy.dest = this.dest.copy();
-		}
-
-		return planeCopy;
-	}
-
-	async update()
-	{
-		return this._manager.updatePlane(this);
-	}
-
-	setDestination(pos, notify)
-	{
-		this.dest = pos;
-
-		if(notify)
-		{
-			this._manager.setPlaneDestination(this, pos);
-		}
-	}
-
-	setOperator(operatorName)
-	{
-		this._manager.setPlaneOperator(this, operatorName);
-	}
-}
 
 class PlaneManager
 {
+	async getPlane(id)
+	{
+		const plane = new Plane(this, id, null, 0);
+		await plane.update();
+		return plane;
+	}
+
 	getPlaneData(id)
 	{
 		// Stub. TODO: fetch actual data from plane manager
@@ -111,11 +77,27 @@ class InformationBoard
 	}
 }
 
-module.exports = {
-	Plane,
-	PlaneManager,
-	ApproachControl,
-	GroundControl,
-	AirportService,
-	InformationBoard
+module.exports = class ModuleInterface
+{
+	constructor()
+	{
+		this._messageHandlers = new Map();
+
+		const addModule = (name, module) =>
+		{
+			this._messageHandlers.set(name, module);
+			return module;
+		}
+
+		this.planeManager = addModule("Board", new PlaneManager());
+		this.approachControl = addModule("Approach Control", new ApproachControl());
+		this.groundControl = addModule("Ground Control", new GroundControl());
+		this.airportService = addModule("Airport Service", new AirportService());
+		this.informationBoard = addModule("Information Board", new InformationBoard());
+	}
+
+	handleMessage(content, from)
+	{
+		// TODO: stuff
+	}
 }
