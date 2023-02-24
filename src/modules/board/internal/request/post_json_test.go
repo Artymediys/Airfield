@@ -31,7 +31,7 @@ func TestPostJson(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	res, err := PostJson[response.Message](testServer.URL, bytes.NewReader(b))
+	res, err := PostJSON[response.Message](testServer.URL, bytes.NewReader(b))
 	if err != nil {
 		t.Fatal(err)
 	}

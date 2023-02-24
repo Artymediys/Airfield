@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-func PostJson[T any](url string, payload io.Reader) (T, error) {
+func PostJSON[T any](url string, payload io.Reader) (T, error) {
 	client := &http.Client{}
 	var result T
 

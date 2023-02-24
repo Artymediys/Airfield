@@ -34,7 +34,7 @@ func GroundControlGetMap(url string, planeID string) ([]int, error) {
 		return nil, fmt.Errorf("failed to encode request: %w", err)
 	}
 
-	resp, err := request.PostJson[GroundControlResponse](url, bytes.NewReader(data))
+	resp, err := request.PostJSON[GroundControlResponse](url, bytes.NewReader(data))
 	if err != nil {
 		return nil, fmt.Errorf("failed to send request: %w", err)
 	}
