@@ -5,6 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DisplayName("Tests groundRouteApi")
 class GraphGroundTest {
@@ -20,8 +21,15 @@ class GraphGroundTest {
     @Test
     void testDijkstraAlgorithmTrue() {
 
-        int[] expectedRes = new int[]{13, 3, 7, 6, 9, 17, 16, 15, 14};
-        int[] actualRes = graphGround.dijkstraAlgorithm(13, 14);
+        int[] expectedRes = new int[]{12, 2, 1, 4, 8, 14};
+        int[] actualRes = graphGround.dijkstraAlgorithm(12, 14);
         assertArrayEquals(expectedRes, actualRes);
+    }
+
+    @Test
+    void testConvertStringToIntControlTrue() {
+
+        assertEquals(19,
+                graphGround.convertStringToIntControl("Follow me"));
     }
 }

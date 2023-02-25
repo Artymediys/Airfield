@@ -3,9 +3,7 @@ package com.example.groundRouteLogic;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -15,27 +13,55 @@ import java.util.stream.Stream;
 public class GraphGround {
 
     private static final int MAX_VAL = 10000;
-    private static final int SIZE_GRAPH = 17;
+    private static final int SIZE_GRAPH = 19;
     //Show the airport map in graph view
-    private static int[][] graphList = {
-            {0, 115, MAX_VAL, 41, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, 35, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL},
-            {115, 0, 109, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, 35, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL},
-            {MAX_VAL, 109, 0, MAX_VAL, MAX_VAL, MAX_VAL, 41, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, 35, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL},
-            {41, MAX_VAL, MAX_VAL, 0, 118, MAX_VAL, MAX_VAL, 42, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL},
-            {MAX_VAL, MAX_VAL, MAX_VAL, 118, 0, 69, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL},
-            {MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, 69, 0, 37, MAX_VAL, 23, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL},
-            {MAX_VAL, MAX_VAL, 41, MAX_VAL, MAX_VAL, 37, 0, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL},
-            {MAX_VAL, MAX_VAL, MAX_VAL, 42, MAX_VAL, MAX_VAL, MAX_VAL, 0, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, 30, MAX_VAL, MAX_VAL, MAX_VAL},
-            {MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, 23, MAX_VAL, MAX_VAL, 0, 61, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, 97},
-            {MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, 61, 0, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL},
-            {35, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, 0, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL},
-            {MAX_VAL, 35, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, 0, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL},
-            {MAX_VAL, MAX_VAL, 35, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, 0, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL},
-            {MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, 30, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, 0, 20, MAX_VAL, MAX_VAL},
-            {MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, 20, 0, 20, MAX_VAL},
-            {MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, 20, 0, 20},
-            {MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, 97, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, 20, 0}
+    private static final int[][] graphList = {
+            {0, 115, MAX_VAL, 41, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, 35, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL},
+            {115, 0, 109, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, 35, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL},
+            {MAX_VAL, 109, 0, MAX_VAL, MAX_VAL, MAX_VAL, 41, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, 35, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL},
+            {41, MAX_VAL, MAX_VAL, 0, 118, MAX_VAL, MAX_VAL, 42, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL},
+            {MAX_VAL, MAX_VAL, MAX_VAL, 118, 0, 69, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL},
+            {MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, 69, 0, 37, MAX_VAL, 23, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL},
+            {MAX_VAL, MAX_VAL, 41, MAX_VAL, MAX_VAL, 37, 0, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, 20, MAX_VAL},
+            {MAX_VAL, MAX_VAL, MAX_VAL, 42, MAX_VAL, MAX_VAL, MAX_VAL, 0, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, 30, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, 30},
+            {MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, 23, MAX_VAL, MAX_VAL, 0, 61, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, 97, MAX_VAL, MAX_VAL},
+            {MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, 61, 0, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL},
+            {35, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, 0, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL},
+            {MAX_VAL, 35, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, 0, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL},
+            {MAX_VAL, MAX_VAL, 35, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, 0, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL},
+            {MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, 30, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, 0, 20, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL},
+            {MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, 20, 0, 20, MAX_VAL, MAX_VAL, MAX_VAL},
+            {MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, 20, 0, 20, MAX_VAL, MAX_VAL},
+            {MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, 97, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, 20, 0, MAX_VAL, MAX_VAL},
+            {MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, 20, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL},
+            {MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, 30, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL, MAX_VAL}
     };
+
+    //converter
+    public static Map<String, Integer> nameToIntControlCheckPoint;
+
+    static {
+        nameToIntControlCheckPoint = new HashMap<>();
+        nameToIntControlCheckPoint.put("Baggage Tractor", 11);
+        nameToIntControlCheckPoint.put("Passenger Bus", 12);
+        nameToIntControlCheckPoint.put("VIP", 13);
+        nameToIntControlCheckPoint.put("Refueler", 18);
+        nameToIntControlCheckPoint.put("Follow me", 19);
+        nameToIntControlCheckPoint.put("Meeting point", 8);
+        nameToIntControlCheckPoint.put("AP1", 14);
+        nameToIntControlCheckPoint.put("AP2", 15);
+        nameToIntControlCheckPoint.put("AP3", 16);
+        nameToIntControlCheckPoint.put("AP4", 17);
+        nameToIntControlCheckPoint.put("Start point", 10);
+        nameToIntControlCheckPoint.put("Board", 8);
+
+    }
+
+    public int convertStringToIntControl(String stringValueCheckPoint) {
+
+        return nameToIntControlCheckPoint.get(stringValueCheckPoint);
+    }
+
 
     public int[] dijkstraAlgorithm(int startIndex, int endIndex) {
 
@@ -112,11 +138,10 @@ public class GraphGround {
         System.out.println();
         log.info("Result in ControlCheckpoints");
 
-        int[] roadMap = routeCheckPoints.stream().
-                collect(reverseOrderCollectionToList()).mapToInt(Integer::intValue).toArray();
         //streamRoute.forEach(s-> System.out.println(s+" "));
 
-        return roadMap;
+        return routeCheckPoints.stream().
+                collect(reverseOrderCollectionToList()).mapToInt(Integer::intValue).toArray();
     }
 
     //get in reverse order

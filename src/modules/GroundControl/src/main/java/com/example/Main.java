@@ -17,17 +17,14 @@ public class Main implements CommandLineRunner {
         SpringApplication.run(Main.class, args);
     }
 
-    private final RabbitMQSender rabbitMQSender;
-
     @Autowired
-    public Main(RabbitMQSender rabbitMQSender) {
-        this.rabbitMQSender = rabbitMQSender;
-    }
+    private RabbitMQSender sender;
 
     @Override
     public void run(String... args) throws Exception {
 
-        rabbitMQSender.sendHelloToServer();
+        //rabbitMQSender.sendHelloToServer();
+        sender.send();
 
     }
 }

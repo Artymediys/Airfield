@@ -1,5 +1,4 @@
-package com.example.message.requestMessage;
-
+package com.example.message.responseMessage;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,10 +9,10 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+public class ResponseMessagePermission implements Serializable {
 
-public class RequestMessageRoadMap implements Serializable {
-
-    private String type;
     private String transportId;
-    private String endPoint;
+    private boolean permission;
+
+
 }

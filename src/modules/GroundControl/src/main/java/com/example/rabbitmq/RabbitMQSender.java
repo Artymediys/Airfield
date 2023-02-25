@@ -1,9 +1,11 @@
 package com.example.rabbitmq;
 
+import com.example.message.requestMessage.RequestMessagePermission;
+import com.example.message.responseMessage.ResponseMessagePermission;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -12,31 +14,25 @@ import org.springframework.stereotype.Service;
 public class RabbitMQSender {
 
     private final RabbitTemplate rabbitTemplate;
-
-    @Value("${rabbitmq.exchangeGL}")
-    private String exchangeGLName;
-    @Value("${rabbitmq.exchangeGC}")
-    private String exchangeGCname;
+    private final DirectExchange directExchange;
 
     public void send() {
-        rabbitTemplate.setExchange(exchangeGCname);
-        rabbitTemplate.convertAndSend("Ground Control");
+
+        RequestMessagePermission request = new RequestMessagePermission(
+                "Ground Control", "board_777", 14, 15
+        );
+
+        rabbitTemplate.convertAndSend(directExchange.getName(), "roadMap", request);
         log.info("Sending Message to the GroundExchange : Ground Control");
     }
 
-    public void sendHelloToServer() throws InterruptedException {
+    public void sendPermissionForMoving(ResponseMessagePermission responseMessagePermission, String exchange) {
 
-        String responseHello = "";
-        rabbitTemplate.setExchange(exchangeGLName);
-        log.info("Send Hello message to Global");
-
-        while (responseHello == (String) rabbitTemplate.convertSendAndReceive("Ground Control")) {
-
-            log.warn("Didnt get the response");
-            Thread.sleep(1000);
-        }
-        log.info("Server is ready for work");
+        rabbitTemplate.convertAndSend(exchange, "temp", responseMessagePermission);
+        log.info("Send message response permission {}", responseMessagePermission);
     }
+
+
 
 
 }

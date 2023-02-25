@@ -69,6 +69,7 @@ public class RabbitConfiguration {
         return rabbitTemplate;
     }
 
+
     @Bean
     public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory() {
         final SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
@@ -78,33 +79,59 @@ public class RabbitConfiguration {
     }
 
     @Bean
-    public Queue myQueue() {
+    public Queue groundControlQueue() {
         return new Queue(queue, false);
     }
 
-    //    @Bean
-//    public Queue myQueueGlobal() {
-//        return new Queue(GLOBAL_QUEUE,false);
-//    }
     @Bean
-    public FanoutExchange fanoutExchangeGC() {
-        return new FanoutExchange(exchangeGC);
+    public Queue tempQueue() {
+        return new Queue("temp", false);
     }
 
     @Bean
-    public FanoutExchange fanoutExchangeGlobal() {
-        return new FanoutExchange(exchangeGL);
+    public DirectExchange directExchangeGC() {
+        return new DirectExchange(exchangeGC);
     }
 
     @Bean
-    public Binding binding1() {
-        return BindingBuilder.bind(myQueue()).to(fanoutExchangeGC());
+    public Binding bindingGC() {
+
+        return BindingBuilder.bind(groundControlQueue())
+                .to(directExchangeGC()).with("roadMap");
     }
 
     @Bean
-    public Binding bindingTemp() {
-        return BindingBuilder.bind(myQueue()).to(fanoutExchangeGlobal());
-    }
+    public Binding TempBindingGC() {
 
+        return BindingBuilder.bind(tempQueue())
+                .to(directExchangeGC()).with("temp");
+    }
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,14 +1,16 @@
 package com.example.message.responseMessage;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.springframework.stereotype.Component;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
 @Data
-@Component
+@AllArgsConstructor
+@NoArgsConstructor
 public class ResponseMessageRoadMap implements Serializable {
 
     private String transportId;
-    private String roadMap;
+    private int[] roadMap;
 }
