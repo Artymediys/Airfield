@@ -74,13 +74,52 @@ func (p *Plane) SavePlane(cfg *config.Config, pl *model.Plane) error {
 		return ErrSaveEmptyPlane
 	}
 
+	passangersCount := struct {
+		Sender string `json:"sender"`
+		Count  int    `json:"count"`
+		Flight string `json:"flight"`
+	}{
+		Sender: senderName,
+		Count:  int(pl.CurrentPassengers),
+		Flight: pl.Flight,
+	}
+
+	body, err := json.Marshal(passangersCount)
+	if err != nil {
+		return err
+	}
+
+	if err = RMQChannel.Publish("Passenger", "Passenger", false, false, amqp.Publishing{
+		Body: body,
+	}); err != nil {
+		return err
+	}
+
+	isDelivered := false
+	for !isDelivered {
+		var msg amqp.Delivery
+		msg, isDelivered, err = RMQChannel.Get("passenger_response_to_board", true)
+		if !isDelivered {
+			continue
+		}
+
+		polineResponse := struct {
+			IDs []string `json:"ids"`
+		}{}
+		if err = json.Unmarshal(msg.Body, &polineResponse); err != nil {
+			return err
+		}
+
+		pl.Passengers = polineResponse.IDs
+	}
+
 	event := PlaneCreationEvent{
 		Sender: senderName,
 		ID:     pl.ID,
 		Type:   string(pl.Type),
 	}
 
-	body, err := json.Marshal(event)
+	body, err = json.Marshal(event)
 	if err != nil {
 		return err
 	}

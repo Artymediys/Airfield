@@ -89,14 +89,27 @@ func main() {
 		lgr.Error("Failed to bind a queue", err)
 		return
 	}
-	// consumeStart, err := ch.Consume("board_start", "board_super_board_start", true, false, false, false, nil)
-	// if err != nil {
-	// 	return
-	// }
-	//
-	// start := <-consumeStart
+
+	_, err = ch.QueueDeclare("passenger_response_to_board", false, true, false, false, nil)
+	if err != nil {
+		lgr.Error("can't declare", err)
+		return
+	}
+
+	err = ch.QueueBind("passenger_response_to_board", "passenger_response_to_board", "board", false, nil)
+	if err != nil {
+		lgr.Error("Failed to bind a queue", err)
+		return
+	}
+
+	consumeStart, err := ch.Consume("board_start", "board_super_board_start", true, false, false, false, nil)
+	if err != nil {
+		return
+	}
+
+	start := <-consumeStart
 	// check start message :)
-	// lgr.Info(string(start.Body))
+	lgr.Info(string(start.Body))
 
 	go func() {
 		ticker := time.NewTicker(10 * time.Second)
