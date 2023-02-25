@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"log"
 
 	"airfield-board/internal/request"
 )
@@ -40,4 +41,35 @@ func GroundControlGetMap(url string, planeID string) ([]int, error) {
 	}
 
 	return resp.RoadMap, nil
+}
+
+type GroundControlLocationRequest struct {
+	BoardID  string `json:"boardId"`
+	Location string `json:"location"`
+}
+
+type GroundControlLocationResponse struct {
+	Status string `json:"status"`
+}
+
+func GroundControlLocation(url, planeID, location string) error {
+	req := GroundControlLocationRequest{
+		BoardID:  planeID,
+		Location: location,
+	}
+
+	// encode request
+	data, err := json.Marshal(req)
+	if err != nil {
+		return fmt.Errorf("failed to encode request: %w", err)
+	}
+
+	r, err := request.PostJSON[GroundControlLocationResponse](url, bytes.NewReader(data))
+	if err != nil {
+		return fmt.Errorf("failed to send request: %w", err)
+	}
+
+	log.Println(r)
+
+	return nil
 }

@@ -27,6 +27,12 @@ func main() {
 	r := router.New(lgr, planeStore)
 	a := app.New(cfg, r, lgr)
 
+	// err = clients.GroundControlLocation(fmt.Sprintf("%s/ground-control/road-map/board/location", cfg.Clients.GroundControlURL), "plane-1", "AP1")
+	// if err != nil {
+	// 	lgr.Error("Failed to send location", err)
+	// 	panic(err)
+	// }
+
 	rabbit, err := amqp.Dial(cfg.RabbitMQAddr())
 	if err != nil {
 		lgr.Error("Failed to connect to RabbitMQ", err)
@@ -83,14 +89,14 @@ func main() {
 		lgr.Error("Failed to bind a queue", err)
 		return
 	}
-	consumeStart, err := ch.Consume("board_start", "board_super_board_start", true, false, false, false, nil)
-	if err != nil {
-		return
-	}
-
-	start := <-consumeStart
+	// consumeStart, err := ch.Consume("board_start", "board_super_board_start", true, false, false, false, nil)
+	// if err != nil {
+	// 	return
+	// }
+	//
+	// start := <-consumeStart
 	// check start message :)
-	lgr.Info(string(start.Body))
+	// lgr.Info(string(start.Body))
 
 	go func() {
 		ticker := time.NewTicker(10 * time.Second)
