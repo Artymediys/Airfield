@@ -1,4 +1,5 @@
 import client, { Channel, Connection, Message, Options } from "amqplib";
+import EventEmitter from "events";
 
 import {
   MY_EXCHANGE_NAME,
@@ -6,7 +7,7 @@ import {
   MY_QUEUE_NAME,
 } from "../common/constants.js";
 
-export class RMQConnection {
+export class RMQConnection extends EventEmitter {
   public log: string;
   private isConnected: boolean = false;
   private settings: Options.Connect;
@@ -14,6 +15,7 @@ export class RMQConnection {
   static instance: RMQConnection;
 
   constructor(settings: Options.Connect) {
+    super();
     this.settings = settings;
   }
 
@@ -50,7 +52,16 @@ export class RMQConnection {
       await this.channel.bindQueue(MY_QUEUE_NAME, MY_EXCHANGE_NAME, "");
       await this.channel.bindQueue(MY_QUEUE_NAME, "global", "");
 
-      return this.channel;
+      this.channel.consume(MY_QUEUE_NAME, async (messsage: Message | null) => {
+        this.emit(
+          "message",
+          messsage.content.toString(),
+          messsage.fields.exchange
+        );
+        this.channel.ack(messsage);
+      });
+
+      // return this.channel;
     } catch (err) {
       console.log(err);
     }
@@ -61,68 +72,22 @@ export class RMQConnection {
       return this.channel.publish(
         exchangeName,
         "",
-        Buffer.from(String(message))
+        Buffer.from(JSON.stringify(message))
       );
     } catch (err) {
       console.log(err);
     }
   }
 
-  public getMessage(myQueue: string): Promise<string | null | undefined> {
-    try {
-      return new Promise<string | null | undefined>((resolve: any) => {
-        this.channel.consume(myQueue, (msg: Message | null): string | null =>
-          resolve(msg.content.toString(), this.channel.ack(msg))
-        );
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  // public async receive(
-  //   myQueue: string,
-  //   onMessage: (msg: Message | null) => any,
-  //   options?: Options.Consume
-  // ) {
+  // public getMessage(myQueue: string): Promise<string | null | undefined> {
   //   try {
-  //     return await this.channel.consume(myQueue, onMessage, options);
-  //   } catch (err) {
-  //     console.log(err);
+  //     return new Promise<string | null | undefined>((resolve: any) => {
+  //       this.channel.consume(myQueue, (msg: Message | null): string | null =>
+  //         resolve(msg.content.toString(), this.channel.ack(msg))
+  //       );
+  //     });
+  //   } catch (error) {
+  //     console.log(error);
   //   }
   // }
 }
-
-//////////////////////////////////
-
-// export const connectionToRmq = async (): Promise<Channel> => {
-//   //Connect to RMQ
-//   const connection: client.Connection = await client.connect({
-//     hostname: "178.20.43.80",
-//     port: 5672,
-//     username: "guest",
-//     password: "guest",
-//   });
-
-//   const channel: Channel = await connection.createChannel();
-
-//   //Create Exchange
-//   await channel.assertExchange(MY_EXCHANGE_NAME, MY_EXCHANGE_TYPE, {
-//     durable: true,
-//     autoDelete: false,
-//     arguments: null,
-//   });
-
-//   //Create Queue
-//   await channel.assertQueue(MY_QUEUE_NAME, {
-//     durable: true,
-//     exclusive: false,
-//     autoDelete: false,
-//     arguments: null,
-//   });
-
-//   //Binding my Queue to my Exchange
-//   await channel.bindQueue(MY_QUEUE_NAME, MY_EXCHANGE_NAME, "");
-
-//   return channel;
-// };

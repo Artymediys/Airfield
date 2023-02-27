@@ -14,17 +14,6 @@ import followMeService from "../followMe/followMe.service.js";
 class BoardService {
   constructor() {}
 
-  // async getMessage() {
-  //   try {
-  //     return await rmq.receive(MY_QUEUE_NAME, (msg: Message) => {
-  //       console.log(msg.content.toString());
-  //       rmq.channel.ack(msg);
-  //     });
-  //   } catch (err) {
-  //     console.log(err);
-  //   }
-  // }
-
   public async createBoard(message: IBoardMessage) {
     try {
       message.plain_id;

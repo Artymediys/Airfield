@@ -8,7 +8,10 @@ import boardService from "./modules/board/board.service.js";
 import refuelerRouter from "./modules/refueler/refueler.route.js";
 import followMeRouter from "./modules/followMe/followMe.route.js";
 import airParkingRouter from "./modules/airParking/airParking.route.js";
+import passBusRouter from "./modules/passBus/passBus.route.js";
 import { IBoardMessage } from "./modules/board/interfaces/board.interface.js";
+import vipBusRouter from "./modules/vipBus/vipBus.route.js";
+import baggageTractorRoute from "./modules/baggageTractor/baggageTractor.route.js";
 
 const app: Express = express();
 
@@ -16,6 +19,9 @@ app.use(express.json());
 app.use("", refuelerRouter);
 app.use("", followMeRouter);
 app.use("", airParkingRouter);
+app.use("", passBusRouter);
+app.use("", vipBusRouter);
+app.use("", baggageTractorRoute);
 
 export const rmq: RMQConnection = new RMQConnection({
   hostname: "178.20.43.80",
@@ -44,9 +50,39 @@ async function Start() {
   } catch (error) {
     console.log(error);
   }
-  // let sender: string = "";
 
-  rmq.send("Visualizer", MY_EXCHANGE_NAME);
+  rmq.channel.publish("Visualizer", "", Buffer.from(String(MY_EXCHANGE_NAME)));
+  rmq.send("Tower Control", { id: "123" });
+
+  rmq.on("message", (content) => {
+    let sender: string = parser(content);
+
+    console.log(sender);
+
+    switch (sender) {
+      case "Board":
+        console.log("Board - ", content);
+        // boardService.createBoard(message as unknown as IBoardMessage);
+        break;
+      case "Follow Me":
+        console.log("Follow Me -", content);
+        break;
+      case "Refueler":
+        console.log("Refueler - ", content);
+        break;
+      case "Passenger Bus":
+        console.log("Passenger Bus - ", content);
+        break;
+      case "Vip Bus":
+        console.log("VIP-BUS - ", content);
+        break;
+      case "Baggage Tractor":
+        console.log("Baggage tractor - ", content);
+        break;
+      default:
+        console.log("DEFAULT - ", content);
+    }
+  });
 
   // const toStart = await rmq.channel.consume(
   //   MY_QUEUE_NAME,
@@ -59,42 +95,9 @@ async function Start() {
   // );
 
   // if (String(toStart) === "Start") {
-  //   return;
+  //   console.log(toStart);
   // }
 }
 
-const getMes = async () => {
-  while (true) {
-    let message: string = await rmq.getMessage(MY_QUEUE_NAME);
-    let sender: string = parser(message);
-
-    // console.log("Sender --- ", sender);
-    // console.log(message);
-
-    switch (sender) {
-      case "Board":
-        boardService.createBoard(message as unknown as IBoardMessage);
-        break;
-      case "Follow Me":
-        console.log("Follow Me");
-        break;
-      case "Refueler":
-        break;
-      case "Passenger Bus":
-        console.log("Passenger Bus");
-        break;
-      case "Vip Bus":
-        console.log("Vip Bus");
-        break;
-      case "Baggage tractor":
-        console.log("Baggage tractor");
-        break;
-      default:
-        console.log("DEFAULT");
-    }
-  }
-};
-
 await startApp();
 await Start();
-await getMes();

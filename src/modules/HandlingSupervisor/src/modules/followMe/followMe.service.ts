@@ -37,7 +37,7 @@ class FolllowMeService {
 
       data.machineId = freeFollowMes[0].id;
 
-      rmq.send(EXCHANGE_REFUELER, Buffer.from(JSON.stringify(data)));
+      rmq.send(EXCHANGE_REFUELER, data);
     } catch (error) {
       throw new Error(error);
     }

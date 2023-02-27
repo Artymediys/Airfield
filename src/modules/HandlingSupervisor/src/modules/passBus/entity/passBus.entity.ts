@@ -16,6 +16,9 @@ export class PassBus {
   })
   state: PassBusStates;
 
+  @Column({ default: null })
+  flight_id: string;
+
   @ManyToOne(() => AirParking, (airParking) => airParking.passBus, {
     onDelete: "CASCADE",
   })
