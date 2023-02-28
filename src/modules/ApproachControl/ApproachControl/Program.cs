@@ -118,7 +118,7 @@ namespace ApproachControl
 
 		void Start()
 		{
-			bc.Strat();
+			bc.Start();
 			Thread thread = new Thread(() => { WorkWithBoard(); });
 			thread.IsBackground = true;
 			thread.Start(); 
@@ -138,7 +138,8 @@ namespace ApproachControl
 				activeBoards = activeBoards.Concat(newBoards).ToList();
 				int boardsCount = activeBoards.Count;
 
-				string ans = bc.GetAnsver("Board");
+				//string ans = bc.GetAnsver("Board");
+				string ans = "";
 				if (ans[0] == '0')
 				{
 
@@ -173,7 +174,7 @@ namespace ApproachControl
 			while(true) 
 			{
 				Board board = new Board();
-				board = bc.GetNewBoard();
+				//board = bc.GetNewBoard();
 
 				RouteCalculating(board);
 				activeBoards.Add(board);
