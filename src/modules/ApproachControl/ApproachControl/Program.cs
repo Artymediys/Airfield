@@ -8,6 +8,7 @@ using System.Threading.Channels;
 using System.Xml.Linq;
 using System.Text.Json.Serialization;
 using System.Numerics;
+using System.Text.RegularExpressions;
 
 namespace ApproachControl
 {
@@ -69,22 +70,21 @@ namespace ApproachControl
 					body: body);
 		}
 
-		public byte[] Receive(string direction = "Visualizer")
+		public string Receive(string direction = "Visualizer")
 		{
 			// Слушаем очередь
 			var consumer = new EventingBasicConsumer(channel);
 			string message = "";
-			byte[] body = { };
 			consumer.Received += (model, ea) =>
 			{
-				body = ea.Body.ToArray();
+				var body = ea.Body.ToArray();
 				message = Encoding.UTF8.GetString(body);
 				Console.WriteLine($" [x] Received {message}");
 			};
 			channel.BasicConsume(queue: direction,
 										autoAck: true,
 										consumer: consumer);
-			return body;
+			return message;
 		}
 
 		public bool IsStart()
@@ -111,19 +111,62 @@ namespace ApproachControl
 	{
 		BoardCommunication bc = new BoardCommunication();
 		List<Board> activeBoards = new List<Board>();
+		List<Board> newBoards = new List<Board>();
 		float width = 10f;
 		float length = 10f;
+		int ansCount = 0;
 
 		void Start()
 		{
 			bc.Strat();
-			Thread thread = new Thread(() => { RouteCalculating(); });
-			thread.IsBackground= true;
+			Thread thread = new Thread(() => { WorkWithBoard(); });
+			thread.IsBackground = true;
+			thread.Start(); 
+			thread = new Thread(() => { WorkWithTower(); });
+			thread.IsBackground = true;
 			thread.Start();
 
 
+			while (true)
+			{}
+		}
+		void WorkWithBoard()
+		{
+
+			while (true)
+			{
+				activeBoards = activeBoards.Concat(newBoards).ToList();
+				int boardsCount = activeBoards.Count;
+
+				string ans = bc.GetAnsver("Board");
+				if (ans[0] == '0')
+				{
+
+				}
+				else if (ans[1] == '1')
+				{
+
+					ansCount++;
+				}
+				if (boardsCount == ansCount)//мб надо +1
+				{
+					foreach (Board board in activeBoards)
+					{
+						bc.GetCordRequest(board);
+					}
+				}
+			}
+
 		}
 
+		void WorkWithTower()
+		{
+			while (true)
+			{
+				bc.GetAnsver("TowerControl");
+			}
+			
+		}
 
 		void AddNewBoard()
 		{
@@ -163,7 +206,7 @@ namespace ApproachControl
 	{
 		Rabbit rabbit = new Rabbit();
 		public BoardCommunication() { }
-		
+
 		string name = "ApproachControl";
 
 		JsonSerializerOptions options = new JsonSerializerOptions()
@@ -172,6 +215,73 @@ namespace ApproachControl
 			Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
 			IgnoreNullValues = true
 		};//Выставление опций сериализации
+
+		public void MessageParse(string message)//Обработка полученных сообщений
+		{
+			string regex = @"^Method:(\w*)";
+			string reqUri = null;
+
+			bool request = false;
+			if (message != null)
+			{
+				if (Regex.IsMatch(message, regex))
+					request = true;
+				else
+					reqUri = message;
+
+
+				if (request)
+				{
+					reqUri = message.Substring(message.IndexOf("\'") + 1, message.LastIndexOf("\'") - message.IndexOf("\'") - 1);
+					message = message.Remove(message.IndexOf("\'"), message.LastIndexOf("\'") - message.IndexOf("\'") + 1);
+					string[] messPart = message.Split(',');
+
+					foreach (string part in messPart)
+					{
+						if (part.Contains("Headers:"))
+						{
+							string nextStep = part.Substring(part.IndexOf('/') + 1, part.LastIndexOf("\r\n") - part.IndexOf('/') - 1);
+							Console.WriteLine(nextStep);
+							if (nextStep == "transfer_plane")
+								TransferPlaneAnsver(reqUri);
+							else if (nextStep == "new_board")
+								GetCordAnsver(reqUri);
+						}
+					}
+					Console.WriteLine(reqUri);
+				}
+				else
+				{
+					if (reqUri.Contains("\"x\"") && reqUri.Contains("\"y\"") && reqUri.Contains("\"z\""))
+					{
+						GetCordAnsver(reqUri);
+					}
+				}
+			}
+		}
+
+		class BoolAns
+		{
+			public bool ready { get; set; }
+		}
+
+		public string TransferPlaneAnsver(string jsonString)
+		{
+			Board board = new Board();
+			board = JsonSerializer.Deserialize<Board>(jsonString);
+			GetCordRequest(board);
+			BoolAns ready = new BoolAns();
+			ready.ready = true;
+			string otvet = JsonSerializer.Serialize(ready, options);
+			return otvet;
+		}
+
+		public void GetCordAnsver(string jsonString)
+		{
+			Board board = new Board();
+			board = JsonSerializer.Deserialize<Board>(jsonString);
+		}//json { "x": number, "y": number, "z": number  }
+
 
 		public HttpRequestMessage Transfer(Board board)
 		{
@@ -217,30 +327,21 @@ namespace ApproachControl
 		{
 			string header = "/current_cord?id=" + board.plane_id;
 			string? body = null;
-            HttpRequestMessage msg = new HttpRequestMessage(HttpMethod.Get, body);
+			HttpRequestMessage msg = new HttpRequestMessage(HttpMethod.Get, body);
 			msg.Headers.Add(name, header);
 			return msg;
 		}//GET /current_cord?id=...
 
-		public void GetCordAnsver(Board board, string jsonString)
-		{
-			board = JsonSerializer.Deserialize<Board>(jsonString);
-		}//json { "x": number, "y": number, "z": number  }
 
-		public void Strat() { while (!rabbit.IsStart()) { } }
+		public void Start() { while (!rabbit.IsStart()) { } }
 
-		public Board GetNewBoard()
-		{
-			Board board = new Board();
-			rabbit.Receive("Board");
-
-			return board;
-		}
 
 		public void GetAnsver(string direction)
 		{
 
 		}
+
+
 	}
 
 
