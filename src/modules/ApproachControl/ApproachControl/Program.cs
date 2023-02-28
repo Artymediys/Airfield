@@ -13,9 +13,10 @@ namespace ApproachControl
 {
 	class Rabbit
 	{
-        IModel channel;
-        string name = "Approach Control";
-        public Rabbit()
+		IModel channel;
+		IModel globalChanel;
+		string name = "Approach Control";
+		public Rabbit()
 		{
 			// Подключение к RabbitMo
 			var factory = new ConnectionFactory
@@ -28,13 +29,19 @@ namespace ApproachControl
 			};
 			var connection = factory.CreateConnection();
 			channel = connection.CreateModel();
-
+			globalChanel = connection.CreateModel();
 			// Создание очереди
 			channel.QueueDeclare(
 				queue: name,
 				durable: true,
 				exclusive: false,
-				//autoDelete: true,
+				autoDelete: true,
+				arguments: null
+				);
+			globalChanel.QueueDeclare(
+				queue: name,
+				durable: true,
+				exclusive: false,
 				arguments: null
 				);
 
@@ -45,8 +52,7 @@ namespace ApproachControl
 				routingKey: name
 				);
 
-			//Подключение к global exchange
-			channel.QueueBind(
+			globalChanel.QueueBind(
 				exchange: "global",
 				queue: name,
 				routingKey: name
@@ -63,10 +69,27 @@ namespace ApproachControl
 					body: body);
 		}
 
-		public string Receive(string direction = "Visualizer")
+		public byte[] Receive(string direction = "Visualizer")
 		{
 			// Слушаем очередь
 			var consumer = new EventingBasicConsumer(channel);
+			string message = "";
+			byte[] body = { };
+			consumer.Received += (model, ea) =>
+			{
+				body = ea.Body.ToArray();
+				message = Encoding.UTF8.GetString(body);
+				Console.WriteLine($" [x] Received {message}");
+			};
+			channel.BasicConsume(queue: direction,
+										autoAck: true,
+										consumer: consumer);
+			return body;
+		}
+
+		public bool IsStart()
+		{
+			var consumer = new EventingBasicConsumer(globalChanel);
 			string message = "";
 			consumer.Received += (model, ea) =>
 			{
@@ -74,19 +97,73 @@ namespace ApproachControl
 				message = Encoding.UTF8.GetString(body);
 				Console.WriteLine($" [x] Received {message}");
 			};
-			channel.BasicConsume(queue: direction,
+			globalChanel.BasicConsume(queue: "Visualizer",
 										autoAck: true,
 										consumer: consumer);
-			return message;
-		}
 
+			if(message.ToLower() == "start")
+				return true;
+			return false;
+		}
 	}
 
 	class BoardControl
 	{
-		Rabbit rabbit = new Rabbit();
-		public BoardControl() { }
+		BoardCommunication bc = new BoardCommunication();
 		List<Board> activeBoards = new List<Board>();
+		float width = 10f;
+		float length = 10f;
+
+		void Start()
+		{
+			bc.Strat();
+			Thread thread = new Thread(() => { RouteCalculating(); });
+			thread.IsBackground= true;
+			thread.Start();
+
+
+		}
+
+
+		void AddNewBoard()
+		{
+			while(true) 
+			{
+				Board board = new Board();
+				board = bc.GetNewBoard();
+
+				RouteCalculating(board);
+				activeBoards.Add(board);
+			};
+		}//Добавление борта в список бортов для управления
+
+
+		void RouteCalculating(Board board)
+		{
+
+		}//Просчет маршрута движения самолетов для передачи на круг и для вывода за пределы зоны покрытия
+
+		void RouteCalculating()
+		{
+			while (true)
+			{
+				if (activeBoards.Count > 0)
+				{
+					foreach (Board board in activeBoards)
+					{
+						
+					}
+				}
+			}
+		}//Просчет маршрута движения самолетов для передачи на круг и для вывода за пределы зоны покрытия
+	}
+
+
+	class BoardCommunication
+	{
+		Rabbit rabbit = new Rabbit();
+		public BoardCommunication() { }
+		
 		string name = "ApproachControl";
 
 		JsonSerializerOptions options = new JsonSerializerOptions()
@@ -96,7 +173,7 @@ namespace ApproachControl
 			IgnoreNullValues = true
 		};//Выставление опций сериализации
 
-		HttpRequestMessage Transfer(Board board)
+		public HttpRequestMessage Transfer(Board board)
 		{
 			Board request = new Board();
 			request.SetStateForJSON(board.plane_id, null, null, null, null, "Tower control");
@@ -106,7 +183,7 @@ namespace ApproachControl
 			return msg;
 		}//POST /transfer, body: json { "plane_id": string, "dispatcher": string }
 
-		HttpRequestMessage TransferPlane(Board board)
+		public HttpRequestMessage TransferPlane(Board board)
 		{
 			Board request = new Board();
 			request.SetStateForJSON(board.plane_id);
@@ -116,7 +193,7 @@ namespace ApproachControl
 			return msg;
 		}//POST /transfer_plane, body: json { "plane_id": string }
 
-		HttpRequestMessage PlaneOutOfZone(Board board)
+		public HttpRequestMessage PlaneOutOfZone(Board board)
 		{
 			Board request = new Board();
 			request.SetStateForJSON(board.plane_id, null, null, null, null, null, true);
@@ -126,7 +203,7 @@ namespace ApproachControl
 			return msg;
 		}//POST /plane_out_of_zone, body: json { "plane_id": string, "out_of_zone": bool }
 
-		HttpRequestMessage Destination(string id, float x, float y, float z)
+		public HttpRequestMessage Destination(string id, float x, float y, float z)
 		{
 			Board destination = new Board();
 			destination.SetStateForJSON(id, x, y, z);
@@ -140,50 +217,49 @@ namespace ApproachControl
 		{
 			string header = "/current_cord?id=" + board.plane_id;
 			string? body = null;
-            HttpRequestMessage msg = new HttpRequestMessage(HttpMethod.Get, body);//Тарас подшамань
+            HttpRequestMessage msg = new HttpRequestMessage(HttpMethod.Get, body);
 			msg.Headers.Add(name, header);
 			return msg;
 		}//GET /current_cord?id=...
 
-		void GetCordAnsver(Board board, string jsonString)
+		public void GetCordAnsver(Board board, string jsonString)
 		{
 			board = JsonSerializer.Deserialize<Board>(jsonString);
 		}//json { "x": number, "y": number, "z": number  }
 
+		public void Strat() { while (!rabbit.IsStart()) { } }
 
-		float width = 10f;
-		float length = 10f;
-
-
-		void AddNewBoard(string json)
+		public Board GetNewBoard()
 		{
-			Board? board = JsonSerializer.Deserialize<Board>(json);
-			activeBoards.Add(board);
-			RouteCalculating(board);
-		}//Добавление борта в список бортов для управления
+			Board board = new Board();
+			rabbit.Receive("Board");
 
-		void RouteCalculating(Board board)
+			return board;
+		}
+
+		public void GetAnsver(string direction)
 		{
-			//GetCordRequest(board);
-		}//Просчет маршрута движения самолетов для передачи на круг и для вывода за пределы зоны покрытия
 
-
-
+		}
 	}
 
 
 	public class Board
-	{//БОООООООООООООООООЛЬШЕЕЕЕЕЕЕЕЕЕЕЕЕЕ ВООООООООПРОООООООООООСИИИИИИИИКООООООООООООВ
+	{//БОООООООООООООООООООООООООООООООЛЬШЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕ ВООООООООООООООООПРООООООООООООООООСИИИИИИИИКОООООООООООООООООООООООВ
 		public string? plane_id { get; set; }
 		public float? x { get; set; }
 		public float? y { get; set; }
 		public float? z { get; set; }
+		public float? dx { get; set; }
+		public float? dy { get; set; }
+		public float? dz { get; set; }
 		public string? status { get; set; }
 		public string? dispatcher { get; set; }
 
 		public bool? outOfZone { get; set; }
 		public void SetStateForJSON(string? id = null, float? x = null, float? y = null,
-			float? z = null, string? status = null, string? dispatcher = null, bool? outOfZone = null)
+			float? z = null, string? status = null, string? dispatcher = null, bool? outOfZone = null,
+			float? dx = null, float? dy = null, float? dz = null)
 		{
 			plane_id = id;
 			this.x = x;
@@ -202,7 +278,7 @@ namespace ApproachControl
 		{
 			//Rabbit rabbit = new Rabbit();
 			//rabbit.Send("Approach Control", "Visualizer");
-			BoardControl board = new BoardControl();
+			BoardCommunication board = new BoardCommunication();
 			Board boarder = new Board();
 			boarder.plane_id = "1212";
 			string test = board.GetCordRequest(boarder).ToString();
