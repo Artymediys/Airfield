@@ -3,14 +3,19 @@ import { FollowMe } from "./entity/followMe.entity.js";
 
 class FollowMeRepository {
   async getAll() {
-    const followMe = await ORMConnection.getRepository(FollowMe).find();
+    const followMe = await ORMConnection.getRepository(FollowMe).find({
+      relations: ["airParking"],
+    });
 
     return followMe;
   }
 
   async getById(id: string) {
-    const followMe = await ORMConnection.getRepository(FollowMe).findOneBy({
-      id: id,
+    const followMe = await ORMConnection.getRepository(FollowMe).findOne({
+      where: {
+        id: id,
+      },
+      relations: ["airParking"],
     });
 
     return followMe;
@@ -20,6 +25,14 @@ class FollowMeRepository {
     const followMe = ORMConnection.getRepository(FollowMe).create(dto);
 
     return await ORMConnection.getRepository(FollowMe).save(followMe);
+  }
+
+  async save(entity: FollowMe) {
+    try {
+      return await ORMConnection.getRepository(FollowMe).save(entity);
+    } catch (error) {
+      throw new Error("Something go wrong while saving Follow-Me");
+    }
   }
 
   async delete(id: string) {

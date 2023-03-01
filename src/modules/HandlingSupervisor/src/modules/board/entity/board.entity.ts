@@ -1,11 +1,4 @@
-import {
-  Column,
-  Entity,
-  OneToOne,
-  PrimaryColumn,
-  PrimaryGeneratedColumn,
-  Relation,
-} from "typeorm";
+import { Entity, OneToOne, PrimaryColumn, Relation } from "typeorm";
 import { AirParking } from "../../../modules/airParking/entity/airParking.entity.js";
 
 @Entity()

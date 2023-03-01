@@ -3,14 +3,19 @@ import { VipBus } from "./entity/vipBus.entity.js";
 
 class VipBusRepository {
   async getAll() {
-    const followMe = await ORMConnection.getRepository(VipBus).find();
+    const followMe = await ORMConnection.getRepository(VipBus).find({
+      relations: ["airParking"],
+    });
 
     return followMe;
   }
 
   async getById(id: string) {
-    const followMe = await ORMConnection.getRepository(VipBus).findOneBy({
-      id: id,
+    const followMe = await ORMConnection.getRepository(VipBus).findOne({
+      where: {
+        id: id,
+      },
+      relations: ["airParking"],
     });
 
     return followMe;

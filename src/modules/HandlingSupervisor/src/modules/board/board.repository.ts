@@ -5,8 +5,11 @@ import { IBoardCreate } from "./interfaces/board.interface.js";
 class BoardRepository {
   async getById(id: string) {
     try {
-      const board = await ORMConnection.getRepository(Board).findOneBy({
-        plain_id: id,
+      const board = await ORMConnection.getRepository(Board).findOne({
+        where: {
+          plain_id: id,
+        },
+        relations: ["airParking"],
       });
 
       if (!board) {
@@ -19,7 +22,7 @@ class BoardRepository {
     }
   }
 
-  async create(dto: IBoardCreate) {
+  async create(dto: { plain_id: string }) {
     const board = ORMConnection.getRepository(Board).create(dto);
 
     return await ORMConnection.getRepository(Board).save(board);

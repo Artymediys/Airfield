@@ -1,3 +1,4 @@
+import { AirParkingProps } from "../../common/constants.js";
 import { ORMConnection } from "../../config/orm.config.js";
 import { AirParking } from "./entity/airParking.entity.js";
 

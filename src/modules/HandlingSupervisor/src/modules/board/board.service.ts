@@ -16,13 +16,14 @@ class BoardService {
 
   public async createBoard(message: IBoardMessage) {
     try {
-      message.plain_id;
+      const { plain_id } = message;
 
-      //Create Board
-      await boardRepository.create(message);
+      console.log("MSG ----------- ", message.plain_id);
+
+      console.log("PLAIN_ID -----------", { plain_id });
 
       //Logic for saving board to AirParking
-      const board = await boardRepository.getById(message.plain_id);
+      const board = await boardRepository.create({ plain_id });
       const freeAirParkings = (await airParkingRepository.getAll()).filter(
         (data: AirParking) => !data.board
       );
@@ -36,7 +37,7 @@ class BoardService {
       //Save Board to AirParking
       await airParkingRepository.save(freeAirParkings[0]);
 
-      await followMeService.send();
+      await followMeService.sendFMToMP();
     } catch (err) {
       console.log(err);
     }

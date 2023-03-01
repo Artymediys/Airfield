@@ -3,15 +3,29 @@ import { MY_EXCHANGE_NAME, MY_QUEUE_NAME } from "./common/constants.js";
 import express, { Express } from "express";
 import { ORMConnection } from "./config/orm.config.js";
 import { RMQConnection } from "./config/rmq.config.js";
-import { parser } from "./helper/parser.js";
 import boardService from "./modules/board/board.service.js";
 import refuelerRouter from "./modules/refueler/refueler.route.js";
 import followMeRouter from "./modules/followMe/followMe.route.js";
 import airParkingRouter from "./modules/airParking/airParking.route.js";
 import passBusRouter from "./modules/passBus/passBus.route.js";
-import { IBoardMessage } from "./modules/board/interfaces/board.interface.js";
+import {
+  IBoardMessage,
+  IBoardFuel,
+} from "./modules/board/interfaces/board.interface.js";
 import vipBusRouter from "./modules/vipBus/vipBus.route.js";
 import baggageTractorRoute from "./modules/baggageTractor/baggageTractor.route.js";
+import boardRouter from "./modules/board/board.route.js";
+import infoPanelService from "./modules/informationPanel/infoPanel.service.js";
+import { IInfoPanel } from "./modules/informationPanel/interfaces/info-panel.interface.js";
+import followMeService from "./modules/followMe/followMe.service.js";
+import {
+  IFollowMeInteraction,
+  IFollowMeReq,
+} from "./modules/followMe/interfaces/followMe.interface.js";
+import refuelerService from "./modules/refueler/refueler.service.js";
+import { IRefuelerReq } from "./modules/refueler/interfaces/refueler.interface.js";
+import passBusService from "./modules/passBus/passBus.service.js";
+import { IPassBusReq } from "./modules/passBus/interfaces/passBus.interface.js";
 
 const app: Express = express();
 
@@ -22,6 +36,7 @@ app.use("", airParkingRouter);
 app.use("", passBusRouter);
 app.use("", vipBusRouter);
 app.use("", baggageTractorRoute);
+app.use("", boardRouter);
 
 export const rmq: RMQConnection = new RMQConnection({
   hostname: "178.20.43.80",
@@ -52,37 +67,6 @@ async function Start() {
   }
 
   rmq.channel.publish("Visualizer", "", Buffer.from(String(MY_EXCHANGE_NAME)));
-  rmq.send("Tower Control", { id: "123" });
-
-  rmq.on("message", (content) => {
-    let sender: string = parser(content);
-
-    console.log(sender);
-
-    switch (sender) {
-      case "Board":
-        console.log("Board - ", content);
-        // boardService.createBoard(message as unknown as IBoardMessage);
-        break;
-      case "Follow Me":
-        console.log("Follow Me -", content);
-        break;
-      case "Refueler":
-        console.log("Refueler - ", content);
-        break;
-      case "Passenger Bus":
-        console.log("Passenger Bus - ", content);
-        break;
-      case "Vip Bus":
-        console.log("VIP-BUS - ", content);
-        break;
-      case "Baggage Tractor":
-        console.log("Baggage tractor - ", content);
-        break;
-      default:
-        console.log("DEFAULT - ", content);
-    }
-  });
 
   // const toStart = await rmq.channel.consume(
   //   MY_QUEUE_NAME,
@@ -94,9 +78,56 @@ async function Start() {
   //   }
   // );
 
-  // if (String(toStart) === "Start") {
-  //   console.log(toStart);
-  // }
+  rmq.on("message", (data, sender) => {
+    try {
+      // if (String(data) === "Start") {
+      //   console.log(data);
+      //   return;
+      // }
+
+      const content = JSON.parse(data);
+      console.log(content.sender);
+
+      switch (content.sender) {
+        case "Board":
+          console.log(`${sender} - `, content);
+          if (typeof content.fuel === "undefined") {
+            boardService.createBoard(content as unknown as IBoardMessage);
+          } else {
+            refuelerService.sendRefuelerToFuel(
+              content as unknown as IBoardFuel
+            );
+          }
+          break;
+        case "Follow Me":
+          console.log(`${sender} - `, content);
+          followMeService.followMeReq(content as unknown as IFollowMeReq);
+          break;
+        case "Refueler":
+          console.log(`${sender} - `, content);
+          refuelerService.refuelerReq(content as unknown as IRefuelerReq);
+          break;
+        case "Passenger Bus":
+          console.log(`${sender} - `, content);
+          passBusService.passBusReq(content as unknown as IPassBusReq);
+          break;
+        case "Vip Bus":
+          console.log(`${sender} - `, content);
+          break;
+        case "Baggage Tractor":
+          console.log(`${sender} - `, content);
+          break;
+        case "Information Panel":
+          console.log(`${sender} - `, content);
+          infoPanelService.sendToPassBus(content as unknown as IInfoPanel);
+          break;
+        default:
+          console.log("DEFAULT - ", content);
+      }
+    } catch (error) {
+      throw new Error(error);
+    }
+  });
 }
 
 await startApp();

@@ -1,6 +1,11 @@
-export interface ICallFollowMe {
+export interface IFollowMeInteraction {
   sender: string;
   machineId: string;
-  // from: string;
   to: string;
+}
+
+export interface IFollowMeReq {
+  sender: string;
+  machineId: string;
+  arrived: true;
 }

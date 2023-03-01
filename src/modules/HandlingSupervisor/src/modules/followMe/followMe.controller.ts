@@ -11,6 +11,15 @@ class FolloMeController {
     }
   }
 
+  async getById(req: Request, res: Response) {
+    try {
+      const followMe = await FollowMeRepository.getById(req.params.id);
+      return res.json(followMe);
+    } catch (error) {
+      res.status(500).json(error);
+    }
+  }
+
   async create(req: Request, res: Response) {
     try {
       const followMe = await FollowMeRepository.create(req.body);

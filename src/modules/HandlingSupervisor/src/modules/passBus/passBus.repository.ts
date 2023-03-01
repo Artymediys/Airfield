@@ -3,14 +3,19 @@ import { PassBus } from "./entity/passBus.entity.js";
 
 class PassBusRepository {
   async getAll() {
-    const followMe = await ORMConnection.getRepository(PassBus).find();
+    const followMe = await ORMConnection.getRepository(PassBus).find({
+      relations: ["airParking"],
+    });
 
     return followMe;
   }
 
   async getById(id: string) {
-    const followMe = await ORMConnection.getRepository(PassBus).findOneBy({
-      id: id,
+    const followMe = await ORMConnection.getRepository(PassBus).findOne({
+      where: {
+        id: id,
+      },
+      relations: ["airParking"],
     });
 
     return followMe;
@@ -20,6 +25,14 @@ class PassBusRepository {
     const followMe = ORMConnection.getRepository(PassBus).create(dto);
 
     return await ORMConnection.getRepository(PassBus).save(followMe);
+  }
+
+  async save(entity: PassBus) {
+    try {
+      return await ORMConnection.getRepository(PassBus).save(entity);
+    } catch (error) {
+      throw new Error("Something go wrong while saving Pass-Bus ");
+    }
   }
 
   async delete(id: string) {
