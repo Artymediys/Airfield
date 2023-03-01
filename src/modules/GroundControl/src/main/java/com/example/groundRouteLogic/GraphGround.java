@@ -57,7 +57,7 @@ public class GraphGround {
 
     }
 
-    public int convertStringToIntControl(String stringValueCheckPoint) {
+    public int convertStringToIntControl(String stringValueCheckPoint) throws IllegalArgumentException {
 
         return nameToIntControlCheckPoint.get(stringValueCheckPoint);
     }

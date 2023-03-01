@@ -4,6 +4,7 @@ import com.example.message.requestMessage.RequestBoardLocation;
 import com.example.message.requestMessage.RequestCompleteSegment;
 import com.example.message.requestMessage.RequestMessagePermission;
 import com.example.message.requestMessage.RequestMessageRoadMap;
+import com.example.message.responseMessage.ResponseBoardLocation;
 import com.example.message.responseMessage.ResponseMessagePermission;
 import com.example.message.responseMessage.ResponseMessageRoadMap;
 import com.example.service.serviceImp.RouteServiceImpl;
@@ -48,10 +49,10 @@ public class RouteController {
     }
 
     @PostMapping("/road-map/board/location")
-    public HttpStatus getBoardLocation(
+    public ResponseBoardLocation getBoardLocation(
             @RequestBody RequestBoardLocation requestBoardLocation) {
         log.info("get board position {}", requestBoardLocation.getBoardId());
         routeService.setLocationForBoard(requestBoardLocation);
-        return HttpStatus.OK;
+        return new ResponseBoardLocation("Status OK");
     }
 }

@@ -43,9 +43,9 @@ public class PermissionForMoving {
 
     public void refreshPermissionList(int startPoint, int finishPoint) {
 
-        if (!permissionList[startPoint][finishPoint]) {
+        if (!permissionList[startPoint - 1][finishPoint - 1]) {
 
-            permissionList[startPoint][finishPoint] = true;
+            permissionList[startPoint - 1][finishPoint - 1] = true;
         }
     }
 

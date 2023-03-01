@@ -48,4 +48,15 @@ class RouteControllerTest {
     }
 
 
+    @Test
+    void getPermissionOnSegment() {
+    }
+
+    @Test
+    void getMessageCompleteSegment() {
+    }
+
+    @Test
+    void getBoardLocation() {
+    }
 }

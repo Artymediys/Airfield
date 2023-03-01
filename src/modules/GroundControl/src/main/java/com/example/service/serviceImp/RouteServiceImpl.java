@@ -11,9 +11,11 @@ import com.example.message.responseMessage.ResponseMessagePermission;
 import com.example.message.responseMessage.ResponseMessageRoadMap;
 import com.example.service.serviceInterface.RouteService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RouteServiceImpl implements RouteService {
@@ -29,7 +31,10 @@ public class RouteServiceImpl implements RouteService {
         int endIndex = graphGround.convertStringToIntControl(request.getEndPoint());
 
         int[] roadMapArray = graphGround.dijkstraAlgorithm(startIndex, endIndex);
+        log.info("create RoadMap complete");
+
         return new ResponseMessageRoadMap(request.getTransportId(), roadMapArray);
+
     }
 
     //return the roadStatus of segment
@@ -38,6 +43,7 @@ public class RouteServiceImpl implements RouteService {
         boolean flagPermission = permission
                 .checkForFreeSegment(messagePermission.getMoveFrom(), messagePermission.getMoveTo());
         return new ResponseMessagePermission(messagePermission.getTransportId(), flagPermission);
+
     }
 
     //make segment free to ride, change location for vehicle

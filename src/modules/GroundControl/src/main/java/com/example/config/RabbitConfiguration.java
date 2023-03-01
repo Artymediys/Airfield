@@ -36,8 +36,6 @@ public class RabbitConfiguration {
     private String queue;
     @Value("${rabbitmq.exchangeGC}")
     private String exchangeGC;
-    @Value("${rabbitmq.exchangeGL}")
-    private String exchangeGL;
 
     @Bean
     public ConnectionFactory connectionFactory() {
@@ -83,10 +81,10 @@ public class RabbitConfiguration {
         return new Queue(queue, false);
     }
 
-    @Bean
-    public Queue tempQueue() {
-        return new Queue("temp", false);
-    }
+//    @Bean
+//    public Queue tempQueue() {
+//        return new Queue("temp", false);
+//    }
 
     @Bean
     public DirectExchange directExchangeGC() {
@@ -100,12 +98,12 @@ public class RabbitConfiguration {
                 .to(directExchangeGC()).with("roadMap");
     }
 
-    @Bean
-    public Binding TempBindingGC() {
-
-        return BindingBuilder.bind(tempQueue())
-                .to(directExchangeGC()).with("temp");
-    }
+//    @Bean
+//    public Binding TempBindingGC() {
+//
+//        return BindingBuilder.bind(tempQueue())
+//                .to(directExchangeGC()).with("temp");
+//    }
 
 }
 

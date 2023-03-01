@@ -11,7 +11,8 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class RabbitMQSender {
+public class
+RabbitMQSender {
 
     private final RabbitTemplate rabbitTemplate;
     private final DirectExchange directExchange;
@@ -22,13 +23,16 @@ public class RabbitMQSender {
                 "Ground Control", "board_777", 14, 15
         );
 
-        rabbitTemplate.convertAndSend(directExchange.getName(), "roadMap", request);
-        log.info("Sending Message to the GroundExchange : Ground Control");
+
+        TowerControl towerControl = new TowerControl("test request");
+        rabbitTemplate.setExchange("Tower Control");
+        rabbitTemplate.convertAndSend(towerControl);
+        log.info("Sending Message to the Tower Control : Ground Control");
     }
 
     public void sendPermissionForMoving(ResponseMessagePermission responseMessagePermission, String exchange) {
 
-        rabbitTemplate.convertAndSend(exchange, "temp", responseMessagePermission);
+        rabbitTemplate.convertAndSend(exchange + "_groundControl", "roadMap", responseMessagePermission);
         log.info("Send message response permission {}", responseMessagePermission);
     }
 
@@ -36,3 +40,4 @@ public class RabbitMQSender {
 
 
 }
+
