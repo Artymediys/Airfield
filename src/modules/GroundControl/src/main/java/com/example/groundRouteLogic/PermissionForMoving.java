@@ -33,7 +33,7 @@ public class PermissionForMoving {
 
     //return the permission about moving in such segment
     public boolean checkForFreeSegment(int startSegment, int finishSegment) {
-
+        //log.info("status on segment:{} {}={}",startSegment,finishSegment,permissionList[startSegment-1][finishSegment-1]);
         if (permissionList[startSegment - 1][finishSegment - 1]) {
 
             permissionList[startSegment - 1][finishSegment - 1] = false;
@@ -42,11 +42,12 @@ public class PermissionForMoving {
     }
 
     public void refreshPermissionList(int startPoint, int finishPoint) {
-
+        //log.info("status on segment:{} {}={}",startPoint,finishPoint,permissionList[startPoint-1][finishPoint-1]);
         if (!permissionList[startPoint - 1][finishPoint - 1]) {
 
             permissionList[startPoint - 1][finishPoint - 1] = true;
         }
+        //log.info("status on segment:{} {}={}",startPoint,finishPoint,permissionList[startPoint-1][finishPoint-1]);
     }
 
 

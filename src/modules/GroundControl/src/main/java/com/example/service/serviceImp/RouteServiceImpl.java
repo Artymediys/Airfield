@@ -31,7 +31,7 @@ public class RouteServiceImpl implements RouteService {
         int endIndex = graphGround.convertStringToIntControl(request.getEndPoint());
 
         int[] roadMapArray = graphGround.dijkstraAlgorithm(startIndex, endIndex);
-        log.info("create RoadMap complete");
+        log.info("create RoadMap complete {} {} {}", request.getTransportId(), startIndex, request.getEndPoint());
 
         return new ResponseMessageRoadMap(request.getTransportId(), roadMapArray);
 
@@ -49,11 +49,13 @@ public class RouteServiceImpl implements RouteService {
     //make segment free to ride, change location for vehicle
     @Transactional
     public void completeSegment(RequestCompleteSegment requestCompleteSegment) {
-
         permission.refreshPermissionList(requestCompleteSegment.getMoveFrom(),
                 requestCompleteSegment.getMoveTo());
+        log.info("Before pos {}", vehicles.findVehicleById(requestCompleteSegment.getTransportId()));
         vehicles.changeOrAddLocation(requestCompleteSegment.getTransportId(),
                 requestCompleteSegment.getMoveTo());
+        log.info("After pos {}", vehicles.findVehicleById(requestCompleteSegment.getTransportId()));
+        log.info("complete segment {}", requestCompleteSegment.getTransportId());
 
     }
 

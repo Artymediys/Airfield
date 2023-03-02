@@ -33,7 +33,9 @@ RabbitMQSender {
     public void sendPermissionForMoving(ResponseMessagePermission responseMessagePermission, String exchange) {
 
         rabbitTemplate.convertAndSend(exchange + "_groundControl", "roadMap", responseMessagePermission);
-        log.info("Send message response permission {}", responseMessagePermission);
+        if (responseMessagePermission.isPermission()) {
+            log.info("Send message response permission {}", responseMessagePermission);
+        }
     }
 
 

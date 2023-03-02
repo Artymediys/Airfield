@@ -53,7 +53,6 @@ public class GraphGround {
         nameToIntControlCheckPoint.put("AP3", 16);
         nameToIntControlCheckPoint.put("AP4", 17);
         nameToIntControlCheckPoint.put("Start point", 10);
-        nameToIntControlCheckPoint.put("Board", 8);
 
     }
 
@@ -65,6 +64,7 @@ public class GraphGround {
 
     public int[] dijkstraAlgorithm(int startIndex, int endIndex) {
 
+        System.out.println(startIndex + " " + endIndex);
         List<Integer> routeCheckPoints = new ArrayList<>();//on exit get route in control points
         int[] minDist = new int[SIZE_GRAPH];// min distance
         int[] visitedNodes = new int[SIZE_GRAPH];//visited Nodes in progress
@@ -131,13 +131,11 @@ public class GraphGround {
             }
         }
         //fix alg-m
-        if (routeCheckPoints.get(0) == routeCheckPoints.get(1)) {
+        if (Objects.equals(routeCheckPoints.get(0), routeCheckPoints.get(1))) {
             routeCheckPoints.remove(0);
         }
         //print
         System.out.println();
-        log.info("Result in ControlCheckpoints");
-
         //streamRoute.forEach(s-> System.out.println(s+" "));
 
         return routeCheckPoints.stream().

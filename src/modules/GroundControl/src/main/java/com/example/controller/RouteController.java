@@ -28,7 +28,6 @@ public class RouteController {
     @PostMapping("/road-map")
     public ResponseEntity<ResponseMessageRoadMap> getRodeMapForVehicles(
             @RequestBody RequestMessageRoadMap roadCredentials) {
-        log.info("RoadMap was asked");
         return new ResponseEntity<>(routeService.createRoadMap(roadCredentials),
                 HttpStatus.OK);
     }
@@ -36,14 +35,12 @@ public class RouteController {
     @PostMapping("/permission-in-segment")
     public ResponseEntity<ResponseMessagePermission> getPermissionOnSegment
             (@RequestBody RequestMessagePermission messagePermission) {
-        log.info("get permission");
         return new ResponseEntity<>(routeService.checkRouteSegment(messagePermission), HttpStatus.OK);
     }
 
     @PostMapping("/road-map/segmentComplete")
     public HttpStatus getMessageCompleteSegment(
             @RequestBody RequestCompleteSegment requestCompleteSegment) {
-        log.info("get Complete message");
         routeService.completeSegment(requestCompleteSegment);
         return HttpStatus.ACCEPTED;
     }

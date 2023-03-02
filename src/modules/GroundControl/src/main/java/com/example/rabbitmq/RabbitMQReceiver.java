@@ -20,7 +20,7 @@ public class RabbitMQReceiver {
     @RabbitListener(queues = "Ground Control")
     public void listenerRoadMap(RequestMessagePermission request) throws Exception {
 
-        log.info("Received message permissionRequest {}", request.toString());
+//        log.info("Received message permissionRequest {}", request.toString());
         rabbitMQSender.sendPermissionForMoving(
                 routeService.checkRouteSegment(request), request.getType()
         );
