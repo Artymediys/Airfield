@@ -33,7 +33,7 @@ export class AirParking {
   @JoinColumn()
   followMe?: FollowMe;
 
-  @OneToOne(() => Refueler, (refueler) => refueler.id, {
+  @OneToOne(() => Refueler, (refueler) => refueler.airParking, {
     onDelete: "CASCADE",
     eager: true,
   })

@@ -3,28 +3,41 @@ import { PassBus } from "./entity/passBus.entity.js";
 
 class PassBusRepository {
   async getAll() {
-    const followMe = await ORMConnection.getRepository(PassBus).find({
+    const passBus = await ORMConnection.getRepository(PassBus).find({
       relations: ["airParking"],
     });
 
-    return followMe;
+    return passBus;
   }
 
   async getById(id: string) {
-    const followMe = await ORMConnection.getRepository(PassBus).findOne({
+    const passBus = await ORMConnection.getRepository(PassBus).findOne({
       where: {
         id: id,
       },
       relations: ["airParking"],
     });
 
-    return followMe;
+    return passBus;
+  }
+
+  async getByFlightId(flight_id: string) {
+    const passBus = await ORMConnection.getRepository(PassBus).findOne({
+      where: { flight_id: flight_id },
+      relations: ["airParking"],
+    });
+
+    if (!passBus) {
+      throw new Error("Pass Bus with this flight_id NOT FOUND");
+    }
+
+    return passBus;
   }
 
   async create(dto: { id: string }) {
-    const followMe = ORMConnection.getRepository(PassBus).create(dto);
+    const passBus = ORMConnection.getRepository(PassBus).create(dto);
 
-    return await ORMConnection.getRepository(PassBus).save(followMe);
+    return await ORMConnection.getRepository(PassBus).save(passBus);
   }
 
   async save(entity: PassBus) {

@@ -18,10 +18,6 @@ class BoardService {
     try {
       const { plain_id } = message;
 
-      console.log("MSG ----------- ", message.plain_id);
-
-      console.log("PLAIN_ID -----------", { plain_id });
-
       //Logic for saving board to AirParking
       const board = await boardRepository.create({ plain_id });
       const freeAirParkings = (await airParkingRepository.getAll()).filter(
@@ -37,7 +33,7 @@ class BoardService {
       //Save Board to AirParking
       await airParkingRepository.save(freeAirParkings[0]);
 
-      await followMeService.sendFMToMP();
+      await followMeService.sendFMToMP(freeAirParkings[0].id);
     } catch (err) {
       console.log(err);
     }

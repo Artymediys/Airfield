@@ -1,5 +1,9 @@
 import { Message } from "amqplib";
-import { MY_EXCHANGE_NAME, MY_QUEUE_NAME } from "./common/constants.js";
+import {
+  MY_EXCHANGE_NAME,
+  MY_QUEUE_NAME,
+  PassengerReq,
+} from "./common/constants.js";
 import express, { Express } from "express";
 import { ORMConnection } from "./config/orm.config.js";
 import { RMQConnection } from "./config/rmq.config.js";
@@ -110,6 +114,10 @@ async function Start() {
         case "Passenger Bus":
           console.log(`${sender} - `, content);
           passBusService.passBusReq(content as unknown as IPassBusReq);
+          break;
+        case "Passenger":
+          console.log(`${sender} - `, content);
+          passBusService.passengerReq(content as unknown as PassengerReq);
           break;
         case "Vip Bus":
           console.log(`${sender} - `, content);

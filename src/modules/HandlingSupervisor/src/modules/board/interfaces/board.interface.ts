@@ -9,6 +9,12 @@ export interface IBoardFuel {
   fuel: number;
 }
 
+export interface IToBoardMsg {
+  sender: string;
+  plain_id: string;
+  msg: string;
+}
+
 export interface IBoardCreate {
   plain_id: string;
 }

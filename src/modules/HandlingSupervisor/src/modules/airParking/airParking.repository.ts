@@ -10,8 +10,10 @@ class AirParkingRepository {
   }
 
   async getById(id: string) {
-    const airParking = await ORMConnection.getRepository(AirParking).findOneBy({
-      id: id,
+    const airParking = await ORMConnection.getRepository(AirParking).findOne({
+      where: {
+        id: id,
+      },
     });
 
     if (!airParking) {

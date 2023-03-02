@@ -15,9 +15,12 @@ import { FollowMe } from "./entity/followMe.entity.js";
 import followMeRepository from "./followMe.repository.js";
 import airParkingRepository from "../airParking/airParking.repository.js";
 import { AirParking } from "../airParking/entity/airParking.entity.js";
+import { IToBoardMsg } from "../board/interfaces/board.interface.js";
 
-const toBoard = {
-  message: "Send Fuel",
+const toBoard: IToBoardMsg = {
+  sender: MY_EXCHANGE_NAME,
+  plain_id: "",
+  msg: "Send fuel count",
 };
 
 const data: IFollowMeInteraction = {
@@ -27,15 +30,16 @@ const data: IFollowMeInteraction = {
 };
 
 class FolllowMeService {
-  async sendFMToMP() {
+  async sendFMToMP(AP_Id: string) {
     try {
-      const freeAirParkings = (await airParkingRepository.getAll()).filter(
-        (data: AirParking) => !data.followMe
-      );
+      const freeAirParking = await airParkingRepository.getById(AP_Id);
+      // const freeAirParkings = (await airParkingRepository.getAll()).filter(
+      //   (data: AirParking) => !data.followMe
+      // );
 
-      if (freeAirParkings.length === 0) {
-        throw new Error("NO FREE AIR-PARKING");
-      }
+      // if (freeAirParkings.length === 0) {
+      //   throw new Error("NO FREE AIR-PARKING");
+      // }
 
       const freeFollowMes = (await followMeRepository.getAll()).filter(
         (data: FollowMe) => !data.airParking
@@ -45,11 +49,11 @@ class FolllowMeService {
         throw new Error("NO FREE FOLLOW-ME");
       }
 
-      freeAirParkings[0].followMe = freeFollowMes[0];
+      freeAirParking.followMe = freeFollowMes[0];
       freeFollowMes[0].state = FollowMeStates.TO_MEETING_POINT;
 
       await followMeRepository.save(freeFollowMes[0]);
-      await airParkingRepository.save(freeAirParkings[0]);
+      await airParkingRepository.save(freeAirParking);
 
       data.machineId = freeFollowMes[0].id;
       data.to = MEETING_POINT;
@@ -67,16 +71,22 @@ class FolllowMeService {
       if (followMe.state === FollowMeStates.TO_AIR_PARKING) {
         followMe.state = FollowMeStates.FREE;
 
-        followMe.airParking = null;
-
         await followMeRepository.save(followMe);
 
+        toBoard.plain_id = followMe.airParking.board.plain_id;
+
         data.machineId = followMe.id;
-        data.to = "Follow Me";
+        data.to = "Follow me";
 
         rmq.send(EXCHANGE_BOARD, toBoard);
 
         return rmq.send(EXCHANGE_FOLLOM_ME, data);
+      } else if (followMe.state === FollowMeStates.FREE) {
+        followMe.airParking = null;
+
+        await followMeRepository.save(followMe);
+
+        return;
       }
 
       followMe.state = FollowMeStates.TO_AIR_PARKING;

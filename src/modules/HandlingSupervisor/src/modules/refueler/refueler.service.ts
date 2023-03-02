@@ -11,18 +11,11 @@ import { Refueler } from "./entity/refueler.entity.js";
 import {
   IRefuelerInteraction,
   IRefuelerReq,
-  IRefuelerAction,
   IRefuelerSend,
 } from "./interfaces/refueler.interface.js";
 import refuelerRepository from "./refueler.repository.js";
 
-const dataAction: IRefuelerAction = {
-  sender: MY_EXCHANGE_NAME,
-  machineId: "",
-  action: "",
-};
-
-const send: IRefuelerSend = {
+const sendTo: IRefuelerSend = {
   sender: MY_EXCHANGE_NAME,
   machineId: "",
   to: "",
@@ -55,13 +48,14 @@ class RefuelerService {
       );
 
       airParking.refueler = freeRefuelers[0];
-      freeRefuelers[0].state = RefuelerStates.TO_TAKE_FUEL;
+      freeRefuelers[0].airParking = airParking;
+      freeRefuelers[0].state = RefuelerStates.TO_AIR_PARKING;
 
       await airParkingRepository.save(airParking);
       await refuelerRepository.save(freeRefuelers[0]);
 
       data.machineId = freeRefuelers[0].id;
-      data.to = "Refueler";
+      data.to = airParking.id;
       data.fuel = message.fuel;
 
       return rmq.send(EXCHANGE_REFUELER, data);
@@ -74,35 +68,22 @@ class RefuelerService {
     try {
       const refueler = await refuelerRepository.getById(message.machineId);
 
-      if (refueler.state === RefuelerStates.TO_UNLOAD_FUEL) {
+      if (refueler.state === RefuelerStates.TO_GARAGE) {
         refueler.state = RefuelerStates.FREE;
 
         refueler.airParking = null;
-
         await refuelerRepository.save(refueler);
 
-        send.machineId = refueler.id;
-        send.to = "Refueler";
-
-        return rmq.send(EXCHANGE_REFUELER, send);
-      } else if (refueler.state === RefuelerStates.TO_TAKE_FUEL) {
-        refueler.state = RefuelerStates.TO_AIR_PARKING;
-
-        await refuelerRepository.save(refueler);
-
-        send.machineId = refueler.id;
-        send.to = refueler.airParking.id;
-
-        return rmq.send(EXCHANGE_REFUELER, data);
+        return;
       } else if (refueler.state === RefuelerStates.TO_AIR_PARKING) {
-        refueler.state = RefuelerStates.TO_UNLOAD_FUEL;
+        refueler.state = RefuelerStates.TO_GARAGE;
 
         await refuelerRepository.save(refueler);
 
-        dataAction.machineId = refueler.id;
-        dataAction.action = "Unload Fuel";
+        sendTo.machineId = refueler.id;
+        sendTo.to = "Refueler";
 
-        return rmq.send(EXCHANGE_REFUELER, dataAction);
+        return rmq.send(EXCHANGE_REFUELER, sendTo);
       }
     } catch (error) {
       throw new Error(error);

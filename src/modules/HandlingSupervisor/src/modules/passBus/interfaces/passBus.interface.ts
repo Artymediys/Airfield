@@ -6,9 +6,9 @@ export interface IPassBusRes {
   to: string;
 }
 
-export interface IPassAction {
+export interface IPassengerAction {
   sender: string;
-  machineId: string;
+  flight_id: string;
   action: string;
 }
 
@@ -16,4 +16,9 @@ export interface IPassBusReq {
   sender: string;
   machineId: string;
   arrived: true;
+}
+
+export enum PassengerAction {
+  LOAD_PASS = "Load Pass",
+  UNLOAD_PASS = "Unload Pass",
 }
