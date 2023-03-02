@@ -1,18 +1,49 @@
 {
-	"connection":
+	"mq":
 	{
-		"hostname": "178.20.43.80",
-		"port": 5672,
-		"username": "guest",
-		"password": "guest"
+		"connection":
+		{
+			"hostname": "178.20.43.80",
+			"port": 5672,
+			"username": "guest",
+			"password": "guest"
+		},
+		"exchange":
+		{
+			"name": "Tower Control",
+			"type": "fanout"
+		},
+		"queue":
+		{
+			"name": "Tower Control"
+		}
 	},
-	"exchange":
+	"modules":
 	{
-		"name": "Tower Control",
-		"type": "fanout"
-	},
-	"queue":
-	{
-		"name": "Tower Control"
+		"planeManager":
+		{
+			"name": "Board",
+			"host": ""
+		},
+		"approachControl":
+		{
+			"name": "Approach Control",
+			"host": ""
+		},
+		"groundControl":
+		{
+			"name": "Ground Control",
+			"host": ""
+		},
+		"airportService":
+		{
+			"name": "Airport Service",
+			"host": ""
+		},
+		"informationBoard":
+		{
+			"name": "Information Panel",
+			"host": ""
+		}
 	}
 }

@@ -91,7 +91,13 @@ function setupView(window, fps)
 	view.setMouseDownCanMoveWindow(true);
 	view.onDraw = render;
 	window.setContentView(view);
+
 	setInterval(() => view.schedulePaint(), 1000 / fps);
+
+	const spawnButton = Gui.Button.create("spawn plane");
+	spawnButton.onClick = Main.moduleInterface._spawnRandomPlane.bind(Main.moduleInterface);
+	view.addChildView(spawnButton);
+
 	return view;
 }
 
