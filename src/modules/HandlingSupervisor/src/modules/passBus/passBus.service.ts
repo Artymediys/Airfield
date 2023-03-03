@@ -32,6 +32,7 @@ class PassBusService {
   async passengerReq(message: PassengerReq) {
     const passBus = await passBusRepository.getByFlightId(message.flight_id);
     res.machineId = passBus.id;
+    console.log(message);
 
     if (message.msg === "Passengers Loaded") {
       passBus.state = PassBusStates.TO_AIR_PARKING;
@@ -56,6 +57,7 @@ class PassBusService {
 
       if (passBus.state === PassBusStates.TO_GARAGE) {
         passBus.state = PassBusStates.FREE;
+        passBus.flight_id = null;
 
         passBus.airParking = null;
 

@@ -41,12 +41,17 @@ class InfoPanelService {
       }
 
       const freePassBuses = (await passBusRepository.getAll()).filter(
-        (data: PassBus) => data.state != PassBusStates.FREE
+        (data: PassBus) => data.state === PassBusStates.FREE
       );
 
-      freeAirParkings[0].passBus[0] = freePassBuses[0];
+      if (freePassBuses.length === 0) {
+        throw new Error("NO FREE PASS BUSES");
+      }
+
+      freeAirParkings[0].passBus = freePassBuses[0];
       freePassBuses[0].airParking = freeAirParkings[0];
       freePassBuses[0].state = PassBusStates.TO_LOAD_PASS;
+      freePassBuses[0].flight_id = message.flight_id;
 
       await passBusRepository.save(freePassBuses[0]);
       await airParkingRepository.save(freeAirParkings[0]);

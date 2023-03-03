@@ -47,10 +47,12 @@ export class AirParking {
   @JoinColumn()
   baggageTractor?: BaggageTractor;
 
-  @OneToMany(() => PassBus, (passBus) => passBus.airParking, {
-    cascade: true,
+  @OneToOne(() => PassBus, (passBus) => passBus.airParking, {
+    onDelete: "CASCADE",
+    eager: true,
   })
-  passBus?: PassBus[];
+  @JoinColumn()
+  passBus?: PassBus;
 
   @OneToOne(() => VipBus, (vipBus) => vipBus.id, {
     onDelete: "CASCADE",
