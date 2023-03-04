@@ -1,0 +1,35 @@
+{
+  "type": "name",
+  "transportId": "id",
+  "endPoint": "name",
+  (string)
+}
+//
+//{
+//  "transportId": "id",
+//  "roadMap": [
+//    тут
+//    массив
+//    int
+//  ]
+//}
+
+{
+  "type": "name",
+  "transportId": "id",
+  "moveFrom": 2,
+  "moveTo": 6
+}
+
+//{
+//  "transportId": "id",
+//  "permission": true/false
+//}
+
+{
+  "transportId": "id",
+  "moveFrom": 2,
+  "moveTo": 6,
+  "complete": true
+}
+
