@@ -293,7 +293,7 @@ namespace ApproachControl
 
 
 
-
+		#region BoardControl interaction
 		public int GetOneAnsverBool()
 		{
 			if (AnsverBool.Count > 0)
@@ -335,8 +335,7 @@ namespace ApproachControl
 			}
 			return null;
 		}
-
-
+		#endregion
 
 
 		public void MessageParse(string message)//Обработка полученных сообщений
@@ -383,11 +382,8 @@ namespace ApproachControl
 			}
 		}
 
-		class BoolAns
-		{
-			public bool ready { get; set; }
-		}
-
+		
+		#region Recieve Message
 		public void GetCordAnsver(string jsonString)
 		{
 			Board temp = new Board();
@@ -403,16 +399,17 @@ namespace ApproachControl
 			AnsverBoardGoAway.Add(temp);
 		}//json {"plane_id":string, "x": number, "y": number, "z": number  }
 
+		class BoolAns
+		{
+			public bool ready { get; set; }
+		}
+
 		public void GetTransferPlaneAnsver(string jsonString)
 		{
 			BoolAns ans = new BoolAns();
 			ans = JsonSerializer.Deserialize<BoolAns>(jsonString);
 			AnsverBool.Add(ans.ready);
 		}
-
-
-
-
 
 		public void SendTransferPlaneAnsver(string jsonString)
 		{
@@ -427,6 +424,34 @@ namespace ApproachControl
 			SendRequest(otvet, "Tower control");
 		}
 
+		public void Reciver()//Прослушивание Борта и Башни Круга
+		{
+			while (true)
+			{
+				for (int i = 0; i < 2; i++)
+				{
+					string destination;
+					if (i == 0)
+						destination = "Board";
+					else
+						destination = "Tower Control";
+					try
+					{
+						string recievedMsg = rabbit.Receive(destination);
+						MessageParse(recievedMsg);
+					}
+					catch (Exception)
+					{
+						continue;
+					}
+				}
+			}
+		}
+
+		#endregion
+
+
+		#region Sending Message
 		public void TransferPlane(Board board)
 		{
 			Board request = new Board();
@@ -484,41 +509,6 @@ namespace ApproachControl
 			SendRequest(msg, "Board");
 		}//GET /current_cord?id=...
 
-
-
-
-		public void Start()
-		{
-			while (!rabbit.IsStart()) { }
-		}
-
-		public void Reciver()//Прослушивание Борта и Башни Круга
-		{
-			while (true)
-			{
-				for (int i = 0; i < 2; i++)
-				{
-					string destination;
-					if (i == 0)
-						destination = "Board";
-					else
-						destination = "Tower Control";
-					try
-					{
-						string recievedMsg = rabbit.Receive(destination);
-						MessageParse(recievedMsg);
-					}
-					catch (Exception)
-					{
-						continue;
-					}
-				}
-			}
-		}
-
-
-
-
 		public void SendRequest(HttpRequestMessage msg, string direction)
 		{
 			rabbit.Send(msg.ToString(), direction);
@@ -527,6 +517,14 @@ namespace ApproachControl
 		public void SendRequest(string msg, string direction)
 		{
 			rabbit.Send(msg, direction);
+		}
+
+		#endregion
+
+
+		public void Start()
+		{
+			while (!rabbit.IsStart()) { }
 		}
 	}
 
