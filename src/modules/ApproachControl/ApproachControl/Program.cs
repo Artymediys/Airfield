@@ -275,6 +275,9 @@ namespace ApproachControl
 		List<bool> AnsverBool = new List<bool>();
 		List<Board> AnsverBoardGoAway = new List<Board>();
 		List<Board> AnsverBoardNew = new List<Board>();
+		List<Board> ActiveBoardArrive = new List<Board>();
+		List<Board> ActiveBoardGoAway = new List<Board>();
+
 
 		Rabbit rabbit = new Rabbit();
 		public BoardCommunication() { }
@@ -357,7 +360,7 @@ namespace ApproachControl
 							if (nextStep == "transfer_plane")
 								SendTransferPlaneAnsver(reqUri);
 							else if (nextStep == "new_board")
-								GetCordAnsver(reqUri);
+								AddNewBoardArriving(reqUri);
 						}
 					}
 				}
@@ -387,9 +390,17 @@ namespace ApproachControl
 
 		public void GetCordAnsver(string jsonString)
 		{
-			Board board = new Board();
-			board = JsonSerializer.Deserialize<Board>(jsonString);
-			AnsverBoardNew.Add(board);
+			Board temp = new Board();
+			temp = JsonSerializer.Deserialize<Board>(jsonString);
+			foreach(Board board in ActiveBoardArrive)
+			{
+				if(temp.plane_id == board.plane_id)
+				{
+					AnsverBoardNew.Add(temp);
+					return;
+				}
+			}
+			AnsverBoardGoAway.Add(temp);
 		}//json {"plane_id":string, "x": number, "y": number, "z": number  }
 
 		public void GetTransferPlaneAnsver(string jsonString)
@@ -408,6 +419,7 @@ namespace ApproachControl
 			Board board = new Board();
 			board = JsonSerializer.Deserialize<Board>(jsonString);
 			AnsverBoardGoAway.Add(board);
+			ActiveBoardGoAway.Add(board);
 			GetCordRequest(board);
 			BoolAns ready = new BoolAns();
 			ready.ready = true;
@@ -424,6 +436,14 @@ namespace ApproachControl
 			msg.Headers.Add(name, "/transfer_plane");
 			SendRequest(msg, "Tower control");
 		}//POST /transfer_plane, body: json { "plane_id": string }
+
+		public void AddNewBoardArriving(string jsonString)
+		{
+			Board board = new Board();
+			board = JsonSerializer.Deserialize<Board>(jsonString);
+			AnsverBoardNew.Add(board);
+			ActiveBoardArrive.Add(board);
+		}//POST ..., body: {"plane_id":string, "x": number, "y": number, "z": number  }
 
 		public void Transfer(Board board)
 		{
