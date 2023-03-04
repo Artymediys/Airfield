@@ -119,7 +119,7 @@ namespace ApproachControl
 		List<Board> newBoardsGoAway = new List<Board>();
 		
 
-		void Start()
+		public void Start()
 		{
 			bc.Start();
 			Thread thread = new Thread(() => { WorkWithBoard(); });
@@ -633,10 +633,14 @@ namespace ApproachControl
 		{
 			//Rabbit rabbit = new Rabbit();
 			//rabbit.Send("Approach Control", "Visualizer");
-			BoardCommunication board = new BoardCommunication();
-			Board boarder = new Board();
-			boarder.plane_id = "1212";
+			//BoardCommunication board = new BoardCommunication();
+			//Board boarder = new Board();
+			//boarder.plane_id = "1212";
 			// Создание списка самолетов
+
+			BoardControl board = new BoardControl();
+			board.Start();
+
 		}
 	}
 }
