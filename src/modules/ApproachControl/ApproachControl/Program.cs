@@ -114,6 +114,7 @@ namespace ApproachControl
 		BoardCommunication bc = new BoardCommunication();
 		List<Board> activeBoards = new List<Board>();
 		List<Board> newBoards = new List<Board>();
+		List<Board> transitBoards = new List<Board>();
 		List<Board> boardsGoAway = new List<Board>();
 		List<Board> newBoardsGoAway = new List<Board>();
 		float width = 10f;
@@ -138,10 +139,39 @@ namespace ApproachControl
 		void WorkWithBoard()
 		{
 			int boardsCount = activeBoards.Count;
+			int transitCount = transitBoards.Count;
 			int ansCount = 0;
+			int towerAnsCount = 0;
+			int k = 0;
 
 			while (true)
 			{
+				
+				int take = bc.GetOneAnsverBool();
+				if(take == 1)
+				{
+					try
+					{
+						bc.Transfer(transitBoards[k]);
+						towerAnsCount++;
+						transitBoards.RemoveAt(k);
+					}
+					catch (Exception)
+					{
+						k++;
+					}
+				}
+
+				if (transitCount == towerAnsCount)
+				{
+					for (int i = k; i < transitBoards.Count; i++)
+					{
+						bc.TransferPlane(transitBoards[i]);
+					}
+					towerAnsCount = transitBoards.Count;
+				}
+
+
 				Board temp = new Board();
 				bool flag = false;
 				temp = bc.GetOneAnsverBoardNew();
@@ -153,7 +183,7 @@ namespace ApproachControl
 				{
 					if (board.plane_id == temp.plane_id)
 					{
-						if (board.dx == temp.x && board.dy == temp.y && board.dz == temp.y)
+						if (board.dx == temp.x && board.dy == temp.y && board.dz == temp.z)
 						{
 							board.x = temp.x;
 							board.y = temp.y;
@@ -161,7 +191,9 @@ namespace ApproachControl
 
 							if (RouteCalculating(board)) 
 							{
-								//добавь логику передачи борта !!!!!!!!!!!!!!
+								transitBoards.Add(board);
+								activeBoards.Remove(board);
+								bc.TransferPlane(board);
 							};
 						}
 						ansCount++;
@@ -170,7 +202,7 @@ namespace ApproachControl
 					}
 				}
 
-				if (flag)
+				if (!flag)
 				{
 					RouteCalculating(temp);
 					newBoards.Add(temp);
@@ -207,7 +239,7 @@ namespace ApproachControl
 				{
 					if (board.plane_id == temp.plane_id)
 					{
-						if (board.dx == temp.x && board.dy == temp.y && board.dz == temp.y)
+						if (board.dx == temp.x && board.dy == temp.y && board.dz == temp.z)
 						{
 							bc.PlaneOutOfZone(board);
 							boardsGoAway.Remove(board);
@@ -218,10 +250,10 @@ namespace ApproachControl
 					}
 				}
 
-				if (flag)
+				if (!flag)
 				{
 					newBoardsGoAway.Add(temp);
-					RouteCalculating(temp);
+					AwayCalculating(temp);
 				}
 
 				if (boardsCount == ansCount)
@@ -236,23 +268,72 @@ namespace ApproachControl
 			}
 		}
 
-		void AddNewBoard()
-		{
-			while(true) 
-			{
-				Board board = new Board();
-				//board = bc.GetNewBoard();
-
-				RouteCalculating(board);
-				activeBoards.Add(board);
-			};
-		}//Добавление борта в список бортов для управления
-
-
 		bool RouteCalculating(Board board)
 		{
-			return true;
-		}//Просчет маршрута движения самолетов для передачи на круг и для вывода за пределы зоны покрытия
+			if ((board.y > -1 && board.y < 1) && ((board.x > -174 && board.x < -172) || (board.x > 172 && board.x < 174)))
+				return true;
+
+			if (board.y != 0 && (board.x < -173|| board.x > 173))
+			{
+				board.dy = 0f;
+				board.dx = board.x;
+				board.dz = board.z;
+			}
+			else if (board.y != 0 && (board.x >= -173 || board.x <= 173))
+			{
+				if ((-173 + board.x) < (board.x - 173))
+				{
+					board.dy = board.y;
+					board.dx = -210f;
+					board.dz = board.z;
+				}
+				else
+				{
+					board.dy = board.y;
+					board.dx = 210f;
+					board.dz = board.z;
+				}
+			}
+			else
+			{
+				if ((-173 + board.x) < (board.x - 173))
+				{
+					board.dy = board.y;
+					board.dx = -173f;
+					board.dz = board.z;
+				}
+				else
+				{
+					board.dy = board.y;
+					board.dx = 173f;
+					board.dz = board.z;
+				}
+			}
+			return false;
+
+		}//Просчет маршрута движения самолетов для передачи на круг
+
+		void AwayCalculating(Board board)
+		{
+			if ((board.x > 490f || board.x < -490f) && (board.y < -17f))
+			{
+				bc.PlaneOutOfZone(board);
+			}
+
+
+			if (board.x > 0)
+			{
+				board.dx = 500f;
+				board.dy = -20f;
+				board.dz = board.z;
+			}
+			else
+			{
+				board.dx = -500f;
+				board.dy = -20f;
+				board.dz = board.z;
+			}
+		}
 
 		void RouteCalculating()
 		{
@@ -292,20 +373,22 @@ namespace ApproachControl
 		};//Выставление опций сериализации
 
 
-
+		int k = 0;
 		#region BoardControl interaction
 		public int GetOneAnsverBool()
 		{
 			if (AnsverBool.Count > 0)
 			{
-				bool ret = AnsverBool[0];
+				bool ret = AnsverBool[k];
 				try
 				{
-					AnsverBool.RemoveAt(0);
+					AnsverBool.RemoveAt(k);
 				}
 				catch (Exception)
-				{}
-				
+				{
+					k++;
+				}
+
 				if (ret)
 					return 1;
 				else
