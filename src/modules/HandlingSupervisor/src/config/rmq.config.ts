@@ -1,4 +1,4 @@
-import client, { Channel, Connection, Message, Options } from "amqplib";
+import client, { Channel, Message, Options } from "amqplib";
 import EventEmitter from "events";
 
 import {
@@ -28,19 +28,14 @@ export class RMQConnection extends EventEmitter {
       this.isConnected = true;
       const connection: client.Connection = await client.connect(this.settings);
 
-      // this.log = "Successfull connection to RMQ server";
-
-      // Create channel
       this.channel = await connection.createChannel();
 
-      // Create Exchange
       await this.channel.assertExchange(MY_EXCHANGE_NAME, MY_EXCHANGE_TYPE, {
         durable: true,
         autoDelete: false,
         arguments: null,
       });
 
-      // Create Queue
       await this.channel.assertQueue(MY_QUEUE_NAME, {
         durable: true,
         exclusive: false,
@@ -48,7 +43,6 @@ export class RMQConnection extends EventEmitter {
         arguments: null,
       });
 
-      // Binding my Queue to my Exchange
       await this.channel.bindQueue(MY_QUEUE_NAME, MY_EXCHANGE_NAME, "");
       await this.channel.bindQueue(MY_QUEUE_NAME, "global", "");
 
@@ -60,8 +54,6 @@ export class RMQConnection extends EventEmitter {
         );
         this.channel.ack(messsage);
       });
-
-      // return this.channel;
     } catch (err) {
       console.log(err);
     }
@@ -78,16 +70,4 @@ export class RMQConnection extends EventEmitter {
       console.log(err);
     }
   }
-
-  // public getMessage(myQueue: string): Promise<string | null | undefined> {
-  //   try {
-  //     return new Promise<string | null | undefined>((resolve: any) => {
-  //       this.channel.consume(myQueue, (msg: Message | null): string | null =>
-  //         resolve(msg.content.toString(), this.channel.ack(msg))
-  //       );
-  //     });
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // }
 }

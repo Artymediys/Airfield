@@ -1,11 +1,4 @@
-import {
-  Column,
-  Entity,
-  ManyToOne,
-  OneToOne,
-  PrimaryColumn,
-  Relation,
-} from "typeorm";
+import { Column, Entity, OneToOne, PrimaryColumn, Relation } from "typeorm";
 import { AirParking } from "../../../modules/airParking/entity/airParking.entity.js";
 import { PassBusStates } from "../../../common/constants.js";
 

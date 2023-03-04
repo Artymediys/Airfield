@@ -1,11 +1,4 @@
-import { Message } from "amqplib";
-import { IBoardCreate, IBoardMessage } from "./interfaces/board.interface.js";
-import {
-  EXCHANGE_REFUELER,
-  MY_EXCHANGE_NAME,
-  MY_QUEUE_NAME,
-} from "../../common/constants.js";
-import { rmq } from "../../main.js";
+import { IBoardMessage } from "./interfaces/board.interface.js";
 import boardRepository from "./board.repository.js";
 import airParkingRepository from "../airParking/airParking.repository.js";
 import { AirParking } from "../airParking/entity/airParking.entity.js";

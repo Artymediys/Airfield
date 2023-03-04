@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import { Refueler } from "./entity/refueler.entity.js";
 import RefuelerRepository from "./refueler.repository.js";
 
 class RefuelerController {

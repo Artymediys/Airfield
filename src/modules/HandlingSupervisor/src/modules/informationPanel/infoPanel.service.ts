@@ -8,18 +8,11 @@ import airParkingRepository from "../airParking/airParking.repository.js";
 import { AirParking } from "../airParking/entity/airParking.entity.js";
 import { PassBus } from "../passBus/entity/passBus.entity.js";
 import {
-  IPassBusRes,
   IPassengerAction,
   PassengerAction,
 } from "../passBus/interfaces/passBus.interface.js";
 import passBusRepository from "../passBus/passBus.repository.js";
 import { IInfoPanel } from "./interfaces/info-panel.interface.js";
-
-const data: IPassBusRes = {
-  sender: MY_EXCHANGE_NAME,
-  machineId: "",
-  to: "Passenger Bus",
-};
 
 const dataAction: IPassengerAction = {
   sender: MY_EXCHANGE_NAME,

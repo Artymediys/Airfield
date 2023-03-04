@@ -1,5 +1,3 @@
-import { PassBus } from "src/common/constants.js";
-
 export interface IPassBusRes {
   sender: string;
   machineId: string;

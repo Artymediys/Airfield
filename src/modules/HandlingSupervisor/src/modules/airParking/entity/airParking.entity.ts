@@ -1,12 +1,4 @@
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  OneToMany,
-  OneToOne,
-  PrimaryColumn,
-  PrimaryGeneratedColumn,
-} from "typeorm";
+import { Entity, JoinColumn, OneToOne, PrimaryColumn } from "typeorm";
 import { Board } from "../../../modules/board/entity/board.entity.js";
 import { Refueler } from "../../../modules/refueler/entity/refueler.entity.js";
 import { BaggageTractor } from "../../../modules/baggageTractor/entity/baggageTractor.enity.js";

@@ -1,6 +1,5 @@
 import { ORMConnection } from "../../config/orm.config.js";
 import { Board } from "./entity/board.entity.js";
-import { IBoardCreate } from "./interfaces/board.interface.js";
 
 class BoardRepository {
   async getById(id: string) {

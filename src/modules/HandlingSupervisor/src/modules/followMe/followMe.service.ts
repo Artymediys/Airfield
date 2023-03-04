@@ -2,7 +2,6 @@ import { rmq } from "../../main.js";
 import {
   EXCHANGE_BOARD,
   EXCHANGE_FOLLOM_ME,
-  EXCHANGE_REFUELER,
   FollowMeStates,
   MEETING_POINT,
   MY_EXCHANGE_NAME,
@@ -14,7 +13,6 @@ import {
 import { FollowMe } from "./entity/followMe.entity.js";
 import followMeRepository from "./followMe.repository.js";
 import airParkingRepository from "../airParking/airParking.repository.js";
-import { AirParking } from "../airParking/entity/airParking.entity.js";
 import { IToBoardMsg } from "../board/interfaces/board.interface.js";
 
 const toBoard: IToBoardMsg = {
@@ -33,13 +31,6 @@ class FolllowMeService {
   async sendFMToMP(AP_Id: string) {
     try {
       const freeAirParking = await airParkingRepository.getById(AP_Id);
-      // const freeAirParkings = (await airParkingRepository.getAll()).filter(
-      //   (data: AirParking) => !data.followMe
-      // );
-
-      // if (freeAirParkings.length === 0) {
-      //   throw new Error("NO FREE AIR-PARKING");
-      // }
 
       const freeFollowMes = (await followMeRepository.getAll()).filter(
         (data: FollowMe) => !data.airParking
