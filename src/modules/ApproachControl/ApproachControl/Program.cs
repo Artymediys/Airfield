@@ -117,8 +117,7 @@ namespace ApproachControl
 		List<Board> transitBoards = new List<Board>();
 		List<Board> boardsGoAway = new List<Board>();
 		List<Board> newBoardsGoAway = new List<Board>();
-		float width = 10f;
-		float length = 10f;
+		
 
 		void Start()
 		{
@@ -309,6 +308,7 @@ namespace ApproachControl
 					board.dz = board.z;
 				}
 			}
+			bc.Destination(board);
 			return false;
 
 		}//Просчет маршрута движения самолетов для передачи на круг
@@ -333,20 +333,7 @@ namespace ApproachControl
 				board.dy = -20f;
 				board.dz = board.z;
 			}
-		}
-
-		void RouteCalculating()
-		{
-			while (true)
-			{
-				if (activeBoards.Count > 0)
-				{
-					foreach (Board board in activeBoards)
-					{
-						
-					}
-				}
-			}
+			bc.Destination(board);
 		}//Просчет маршрута движения самолетов для передачи на круг и для вывода за пределы зоны покрытия
 	}
 
@@ -573,10 +560,10 @@ namespace ApproachControl
 			SendRequest(msg, "Board");
 		}//POST /plane_out_of_zone, body: json { "plane_id": string, "out_of_zone": bool }
 
-		public void Destination(string id, float x, float y, float z)
+		public void Destination(Board board)
 		{
 			Board destination = new Board();
-			destination.SetStateForJSON(id, x, y, z);
+			destination.SetStateForJSON(board.plane_id, board.dx, board.dy, board.dz);
 			string jsonString = JsonSerializer.Serialize(destination, options);
 			HttpRequestMessage msg = new HttpRequestMessage(HttpMethod.Post, jsonString);
 			msg.Headers.Add(name, "/destination");
