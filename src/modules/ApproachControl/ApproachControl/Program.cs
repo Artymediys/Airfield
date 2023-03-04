@@ -39,6 +39,7 @@ namespace ApproachControl
 				autoDelete: true,
 				arguments: null
 				);
+
 			globalChanel.QueueDeclare(
 				queue: name,
 				durable: true,
@@ -109,12 +110,14 @@ namespace ApproachControl
 
 	class BoardControl
 	{
+		Rabbit rabbit = new Rabbit();
 		BoardCommunication bc = new BoardCommunication();
 		List<Board> activeBoards = new List<Board>();
 		List<Board> newBoards = new List<Board>();
+		List<Board> boardsGoAway = new List<Board>();
+		List<Board> newBoardsGoAway = new List<Board>();
 		float width = 10f;
 		float length = 10f;
-		int ansCount = 0;
 
 		void Start()
 		{
@@ -125,48 +128,112 @@ namespace ApproachControl
 			thread = new Thread(() => { WorkWithTower(); });
 			thread.IsBackground = true;
 			thread.Start();
-
+			thread = new Thread(() => { bc.Reciver(); });
+			thread.IsBackground = true;
+			thread.Start();
 
 			while (true)
 			{}
 		}
 		void WorkWithBoard()
 		{
+			int boardsCount = activeBoards.Count;
+			int ansCount = 0;
 
 			while (true)
 			{
-				activeBoards = activeBoards.Concat(newBoards).ToList();
-				int boardsCount = activeBoards.Count;
+				Board temp = new Board();
+				bool flag = false;
+				temp = bc.GetOneAnsverBoardNew();
 
-				//string ans = bc.GetAnsver("Board");
-				string ans = "";
-				if (ans[0] == '0')
+				if (temp == null)
+					continue;
+
+				foreach (Board board in activeBoards)
 				{
+					if (board.plane_id == temp.plane_id)
+					{
+						if (board.dx == temp.x && board.dy == temp.y && board.dz == temp.y)
+						{
+							board.x = temp.x;
+							board.y = temp.y;
+							board.z = temp.z;
 
+							if (RouteCalculating(board)) 
+							{
+								//добавь логику передачи борта !!!!!!!!!!!!!!
+							};
+						}
+						ansCount++;
+						flag = true;
+						break;
+					}
 				}
-				else if (ans[1] == '1')
+
+				if (flag)
 				{
-
-					ansCount++;
+					RouteCalculating(temp);
+					newBoards.Add(temp);
 				}
-				if (boardsCount == ansCount)//мб надо +1
+					
+				if (boardsCount == ansCount)
 				{
 					foreach (Board board in activeBoards)
 					{
 						bc.GetCordRequest(board);
 					}
+					activeBoards = activeBoards.Concat(newBoards).ToList();
+					boardsCount = activeBoards.Count;
 				}
 			}
-
 		}
 
 		void WorkWithTower()
 		{
+			int boardsCount = boardsGoAway.Count;
+			int ansCount = 0;
+
 			while (true)
 			{
-				bc.GetAnsver("TowerControl");
+				Board temp = new Board();
+				bool flag = false;
+				temp = bc.GetOneAnsverBoardGoAway();
+
+				if (temp == null)
+					continue;
+
+
+				foreach (Board board in boardsGoAway)
+				{
+					if (board.plane_id == temp.plane_id)
+					{
+						if (board.dx == temp.x && board.dy == temp.y && board.dz == temp.y)
+						{
+							bc.PlaneOutOfZone(board);
+							boardsGoAway.Remove(board);
+						}
+						ansCount++;
+						flag = true;
+						break;
+					}
+				}
+
+				if (flag)
+				{
+					newBoardsGoAway.Add(temp);
+					RouteCalculating(temp);
+				}
+
+				if (boardsCount == ansCount)
+				{
+					foreach (Board board in boardsGoAway)
+					{
+						bc.GetCordRequest(board);
+					}
+					boardsGoAway = boardsGoAway.Concat(newBoardsGoAway).ToList();
+					boardsCount = boardsGoAway.Count;
+				}
 			}
-			
 		}
 
 		void AddNewBoard()
@@ -182,9 +249,9 @@ namespace ApproachControl
 		}//Добавление борта в список бортов для управления
 
 
-		void RouteCalculating(Board board)
+		bool RouteCalculating(Board board)
 		{
-
+			return true;
 		}//Просчет маршрута движения самолетов для передачи на круг и для вывода за пределы зоны покрытия
 
 		void RouteCalculating()
@@ -205,6 +272,10 @@ namespace ApproachControl
 
 	class BoardCommunication
 	{
+		List<bool> AnsverBool = new List<bool>();
+		List<Board> AnsverBoardGoAway = new List<Board>();
+		List<Board> AnsverBoardNew = new List<Board>();
+
 		Rabbit rabbit = new Rabbit();
 		public BoardCommunication() { }
 
@@ -217,21 +288,62 @@ namespace ApproachControl
 			IgnoreNullValues = true
 		};//Выставление опций сериализации
 
+
+
+
+		public int GetOneAnsverBool()
+		{
+			if (AnsverBool.Count > 0)
+			{
+				bool ret = AnsverBool[0];
+				try
+				{
+					AnsverBool.RemoveAt(0);
+				}
+				catch (Exception)
+				{}
+				
+				if (ret)
+					return 1;
+				else
+					return 0;
+			}
+			return -1;
+		}
+
+		public Board GetOneAnsverBoardGoAway()
+		{
+			if (AnsverBoardGoAway.Count > 0)
+			{
+				Board board = AnsverBoardGoAway[0];
+				AnsverBoardGoAway.Remove(board);
+				return board;
+			}
+			return null;
+		}
+
+		public Board GetOneAnsverBoardNew()
+		{
+			if (AnsverBoardNew.Count > 0)
+			{
+				Board board = AnsverBoardNew[0];
+				AnsverBoardGoAway.Remove(board);
+				return board;
+			}
+			return null;
+		}
+
+
+
+
 		public void MessageParse(string message)//Обработка полученных сообщений
 		{
 			string regex = @"^Method:(\w*)";
 			string reqUri = null;
 
-			bool request = false;
 			if (message != null)
 			{
 				if (Regex.IsMatch(message, regex))
-					request = true;
-				else
-					reqUri = message;
-
-
-				if (request)
 				{
 					reqUri = message.Substring(message.IndexOf("\'") + 1, message.LastIndexOf("\'") - message.IndexOf("\'") - 1);
 					message = message.Remove(message.IndexOf("\'"), message.LastIndexOf("\'") - message.IndexOf("\'") + 1);
@@ -242,22 +354,29 @@ namespace ApproachControl
 						if (part.Contains("Headers:"))
 						{
 							string nextStep = part.Substring(part.IndexOf('/') + 1, part.LastIndexOf("\r\n") - part.IndexOf('/') - 1);
-							Console.WriteLine(nextStep);
 							if (nextStep == "transfer_plane")
-								TransferPlaneAnsver(reqUri);
+								SendTransferPlaneAnsver(reqUri);
 							else if (nextStep == "new_board")
 								GetCordAnsver(reqUri);
 						}
 					}
-					Console.WriteLine(reqUri);
 				}
 				else
 				{
+					reqUri = message;
 					if (reqUri.Contains("\"x\"") && reqUri.Contains("\"y\"") && reqUri.Contains("\"z\""))
 					{
 						GetCordAnsver(reqUri);
 					}
+					else if (reqUri.Contains("ready:"))
+					{
+						GetTransferPlaneAnsver(reqUri);
+					}
 				}
+			}
+			else
+			{
+				return;
 			}
 		}
 
@@ -266,83 +385,129 @@ namespace ApproachControl
 			public bool ready { get; set; }
 		}
 
-		public string TransferPlaneAnsver(string jsonString)
-		{
-			Board board = new Board();
-			board = JsonSerializer.Deserialize<Board>(jsonString);
-			GetCordRequest(board);
-			BoolAns ready = new BoolAns();
-			ready.ready = true;
-			string otvet = JsonSerializer.Serialize(ready, options);
-			return otvet;
-		}
-
 		public void GetCordAnsver(string jsonString)
 		{
 			Board board = new Board();
 			board = JsonSerializer.Deserialize<Board>(jsonString);
-		}//json { "x": number, "y": number, "z": number  }
+			AnsverBoardNew.Add(board);
+		}//json {"plane_id":string, "x": number, "y": number, "z": number  }
 
-
-		public HttpRequestMessage Transfer(Board board)
+		public void GetTransferPlaneAnsver(string jsonString)
 		{
-			Board request = new Board();
-			request.SetStateForJSON(board.plane_id, null, null, null, null, "Tower control");
-			string body = JsonSerializer.Serialize<Board>(request, options);
-			HttpRequestMessage msg = new HttpRequestMessage(HttpMethod.Post, body);
-			msg.Headers.Add(name, "/transfer");
-			return msg;
-		}//POST /transfer, body: json { "plane_id": string, "dispatcher": string }
+			BoolAns ans = new BoolAns();
+			ans = JsonSerializer.Deserialize<BoolAns>(jsonString);
+			AnsverBool.Add(ans.ready);
+		}
 
-		public HttpRequestMessage TransferPlane(Board board)
+
+
+
+
+		public void SendTransferPlaneAnsver(string jsonString)
+		{
+			Board board = new Board();
+			board = JsonSerializer.Deserialize<Board>(jsonString);
+			AnsverBoardGoAway.Add(board);
+			GetCordRequest(board);
+			BoolAns ready = new BoolAns();
+			ready.ready = true;
+			string otvet = JsonSerializer.Serialize(ready, options);
+			SendRequest(otvet, "Tower control");
+		}
+
+		public void TransferPlane(Board board)
 		{
 			Board request = new Board();
 			request.SetStateForJSON(board.plane_id);
 			string body = JsonSerializer.Serialize<Board>(request, options);
 			HttpRequestMessage msg = new HttpRequestMessage(HttpMethod.Post, body);
 			msg.Headers.Add(name, "/transfer_plane");
-			return msg;
+			SendRequest(msg, "Tower control");
 		}//POST /transfer_plane, body: json { "plane_id": string }
 
-		public HttpRequestMessage PlaneOutOfZone(Board board)
+		public void Transfer(Board board)
+		{
+			Board request = new Board();
+			request.SetStateForJSON(board.plane_id, null, null, null, null, "Tower control");
+			string body = JsonSerializer.Serialize<Board>(request, options);
+			HttpRequestMessage msg = new HttpRequestMessage(HttpMethod.Post, body);
+			msg.Headers.Add(name, "/transfer");
+			SendRequest(msg, "Board");
+		}//POST /transfer, body: json { "plane_id": string, "dispatcher": string }
+
+		public void PlaneOutOfZone(Board board)
 		{
 			Board request = new Board();
 			request.SetStateForJSON(board.plane_id, null, null, null, null, null, true);
 			string body = JsonSerializer.Serialize<Board>(request, options);
 			HttpRequestMessage msg = new HttpRequestMessage(HttpMethod.Post, body);
 			msg.Headers.Add(name, "/plane_out_of_zone");
-			return msg;
+			SendRequest(msg, "Board");
 		}//POST /plane_out_of_zone, body: json { "plane_id": string, "out_of_zone": bool }
 
-		public HttpRequestMessage Destination(string id, float x, float y, float z)
+		public void Destination(string id, float x, float y, float z)
 		{
 			Board destination = new Board();
 			destination.SetStateForJSON(id, x, y, z);
 			string jsonString = JsonSerializer.Serialize(destination, options);
 			HttpRequestMessage msg = new HttpRequestMessage(HttpMethod.Post, jsonString);
 			msg.Headers.Add(name, "/destination");
-			return msg;
+			SendRequest(msg, "Board");
 		}//POST /destination, body: json { "plane_id": string, "x": number, "y": number, "z": number }
 
-		public HttpRequestMessage GetCordRequest(Board board)
+		public void GetCordRequest(Board board)
 		{
 			string header = "/current_cord?id=" + board.plane_id;
 			string? body = null;
 			HttpRequestMessage msg = new HttpRequestMessage(HttpMethod.Get, body);
 			msg.Headers.Add(name, header);
-			return msg;
+			SendRequest(msg, "Board");
 		}//GET /current_cord?id=...
 
 
-		public void Start() { while (!rabbit.IsStart()) { } }
 
 
-		public void GetAnsver(string direction)
+		public void Start()
 		{
+			while (!rabbit.IsStart()) { }
+		}
 
+		public void Reciver()//Прослушивание Борта и Башни Круга
+		{
+			while (true)
+			{
+				for (int i = 0; i < 2; i++)
+				{
+					string destination;
+					if (i == 0)
+						destination = "Board";
+					else
+						destination = "Tower Control";
+					try
+					{
+						string recievedMsg = rabbit.Receive(destination);
+						MessageParse(recievedMsg);
+					}
+					catch (Exception)
+					{
+						continue;
+					}
+				}
+			}
 		}
 
 
+
+
+		public void SendRequest(HttpRequestMessage msg, string direction)
+		{
+			rabbit.Send(msg.ToString(), direction);
+		}
+
+		public void SendRequest(string msg, string direction)
+		{
+			rabbit.Send(msg, direction);
+		}
 	}
 
 
@@ -383,8 +548,6 @@ namespace ApproachControl
 			BoardCommunication board = new BoardCommunication();
 			Board boarder = new Board();
 			boarder.plane_id = "1212";
-			string test = board.GetCordRequest(boarder).ToString();
-			Console.WriteLine(test);
 			// Создание списка самолетов
 		}
 	}

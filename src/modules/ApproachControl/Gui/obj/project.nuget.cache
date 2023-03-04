@@ -1,14 +1,14 @@
 {
   "version": 2,
-  "dgSpecHash": "aS/4k6XgFUPpYXkjPenXZE7a1GwB4iGC0XSrtt8l58GhukkI6udk+x4Y443woWqQYuz8mOjYi4olc1HM962hwQ==",
+  "dgSpecHash": "qhfCzg6Fux3hBZfemqcwVUBjD9CS29t2nAx4eYF6ZQTyrLH2KWSfsffwTzpIqbdE63WSyZ5CsPG1q1cX+5jK3A==",
   "success": true,
-  "projectFilePath": "B:\\git\\Airfield\\src\\modules\\ApproachControl\\Gui\\Gui.csproj",
+  "projectFilePath": "D:\\Airfield\\src\\modules\\ApproachControl\\Gui\\Gui.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\tatat\\.nuget\\packages\\newtonsoft.json\\12.0.1\\newtonsoft.json.12.0.1.nupkg.sha512",
-    "C:\\Users\\tatat\\.nuget\\packages\\newtonsoft.json.bson\\1.0.2\\newtonsoft.json.bson.1.0.2.nupkg.sha512",
-    "C:\\Users\\tatat\\.nuget\\packages\\rabbitmq.client\\6.4.0\\rabbitmq.client.6.4.0.nupkg.sha512",
-    "C:\\Users\\tatat\\.nuget\\packages\\system.memory\\4.5.4\\system.memory.4.5.4.nupkg.sha512",
-    "C:\\Users\\tatat\\.nuget\\packages\\system.threading.channels\\4.7.1\\system.threading.channels.4.7.1.nupkg.sha512"
+    "C:\\Users\\user\\.nuget\\packages\\newtonsoft.json\\12.0.1\\newtonsoft.json.12.0.1.nupkg.sha512",
+    "C:\\Users\\user\\.nuget\\packages\\newtonsoft.json.bson\\1.0.2\\newtonsoft.json.bson.1.0.2.nupkg.sha512",
+    "C:\\Users\\user\\.nuget\\packages\\rabbitmq.client\\6.4.0\\rabbitmq.client.6.4.0.nupkg.sha512",
+    "C:\\Users\\user\\.nuget\\packages\\system.memory\\4.5.4\\system.memory.4.5.4.nupkg.sha512",
+    "C:\\Users\\user\\.nuget\\packages\\system.threading.channels\\4.7.1\\system.threading.channels.4.7.1.nupkg.sha512"
   ],
   "logs": []
 }
